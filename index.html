@@ -1,0 +1,467 @@
+html = """
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Taco League 2025</title>
+  <style>
+    body {
+      background: #181818 url('https://cdn.pixabay.com/photo/2017/01/14/12/59/abstract-1979932_1280.jpg') repeat;
+      color: #fff;
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0; padding: 0;
+    }
+    .mainbox {
+      background: #232323ee;
+      max-width: 940px;
+      margin: 38px auto;
+      border: 6px solid #0ff;
+      border-radius: 19px;
+      padding: 30px 34px 24px 34px;
+      box-shadow: 0 0 40px #00f8ff, 0 0 20px #fff4 inset;
+    }
+    h1 {
+      font-family: Impact, fantasy;
+      color: #0ff;
+      letter-spacing: 3px;
+      text-shadow: 4px 3px 10px #0ff, 1px 1px 0 #000;
+      font-size: 2.7em;
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .musicbox {
+      margin: 0 auto 28px auto;
+      max-width: 360px;
+      background: #101a26e7;
+      border: 2.5px solid #ffd700;
+      border-radius: 12px;
+      text-align: center;
+      padding: 14px 0 5px 0;
+      box-shadow: 0 0 18px #00f9, 0 0 12px #ffd7005f;
+    }
+    .musicbox audio {
+      width: 90%;
+      margin: 0 auto;
+      display: block;
+      background: #ffd70011;
+    }
+    .music-note {
+      font-size: 1.15em;
+      color: #ffd700;
+      margin: 2px 0 0 0;
+      font-weight: bold;
+      text-shadow: 0 1px 7px #0ff6;
+    }
+    .section-title {
+      font-family: Impact, fantasy;
+      font-size: 2em;
+      color: #ffd700;
+      text-shadow: 2px 2px 0 #ad5405, 0 0 7px #000c;
+      letter-spacing: 1.5px;
+      margin-top: 32px;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #ffd70077;
+      padding-bottom: 5px;
+      width: max-content;
+    }
+    .section {
+      margin-top: 8px;
+      margin-bottom: 24px;
+      font-size: 1.13em;
+      background: #fff2;
+      padding: 16px 26px 18px 26px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px #fff3;
+      color: #ffecc6;
+      line-height: 1.8em;
+    }
+    ul, li {
+      font-size: 1.08em;
+      color: #fffde8;
+      margin-bottom: 13px;
+      margin-top: 2px;
+      line-height: 1.7em;
+    }
+    .marquee {
+      margin: 21px 0 13px 0;
+      font-size: 1.11em;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #001e2d;
+      color: #ffd700;
+      border-radius: 7px;
+      padding: 7px 10px;
+      box-shadow: 0 0 10px #0ff6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .topfriends {
+      background: #0ff1;
+      border-radius: 12px;
+      margin: 26px 0 18px 0;
+      padding: 17px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 27px;
+      justify-content: center;
+      box-shadow: 0 0 18px #0ff4;
+    }
+    .friend {
+      text-align: center;
+      width: 92px;
+      cursor: pointer;
+    }
+    .friend img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid #0ff;
+      background: #fff;
+      margin-bottom: 7px;
+      transition: transform 0.22s;
+      box-shadow: 0 0 9px #fff7, 0 0 9px #0ff;
+    }
+    .friend img:hover {
+      transform: scale(1.17) rotate(-6deg);
+      border: 3px solid #ffd700;
+    }
+    .friend span {
+      font-size: 1.09em;
+      color: #fff;
+      background: #111b;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+    #keeper-table {
+      margin-top: 30px;
+      width: 98%;
+      background: #1a2837;
+      border-radius: 11px;
+      box-shadow: 0 0 10px #0090ff3f;
+      display: none;
+    }
+    #keeper-table th, #keeper-table td {
+      padding: 12px 11px;
+      font-size: 1.07em;
+      border-bottom: 1px solid #22395b;
+    }
+    #keeper-table th {
+      background: #0ff6;
+      color: #181818;
+    }
+    #keeper-table td {
+      color: #ffd700;
+    }
+    #keeper-table tr:last-child td {
+      border-bottom: none;
+    }
+    #keeper-table caption {
+      color: #fff;
+      font-size: 1.28em;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+    .no-keepers {
+      color: #ffd700;
+      font-size: 1.11em;
+      margin: 30px auto 0 auto;
+      text-align: center;
+    }
+    /* Overlay modal styles */
+    #overlay {
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(20,20,22,0.97);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #overlay h2 {
+      font-size: 2.1em;
+      color: #ffd700;
+      margin-bottom: 18px;
+      text-shadow: 2px 2px 14px #0ff, 0 0 7px #000c;
+      font-family: Impact, fantasy;
+    }
+    #overlay .playbtn {
+      background: #0ff;
+      color: #191818;
+      border: none;
+      font-size: 1.35em;
+      font-family: Impact, Arial, sans-serif;
+      padding: 15px 32px;
+      border-radius: 14px;
+      box-shadow: 0 0 10px #ffd7008f, 0 0 10px #0ff;
+      margin: 22px 0 0 0;
+      font-weight: bold;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    #overlay .playbtn:hover {
+      background: #ffd700;
+      color: #001e2d;
+    }
+    @media (max-width: 650px) {
+      .mainbox { padding: 8px; }
+      .section, .musicbox { padding: 7px 4vw; }
+      h1 { font-size: 2em; }
+      .section-title { font-size: 1.23em; }
+      #keeper-table { font-size: 0.97em; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay for music play -->
+  <div id="overlay">
+    <h2>Welcome to Taco League!</h2>
+    <p style="font-size:1.17em;color:#fff;margin-bottom:18px;">
+      <br>
+      <b>Click PLAY below to enter:</b>
+    </p>
+    <button class="playbtn" onclick="startSite()">▶ Play Here Comes the Boom</button>
+    <audio id="audioPre" src="here_comes_the_boom.mp3"></audio>
+  </div>
+  <div class="mainbox" style="display:none;" id="mainContent">
+    <h1>🌮 Taco League 2025 🌮</h1>
+    <div class="musicbox">
+      <audio id="audioPlayer" controls loop>
+        <source src="here_comes_the_boom.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      <div class="music-note">
+        
+      </div>
+    </div>
+    <div class="marquee">
+      Draft is August 23, 2025. Keepers and buy-in are due August 16, 2025.
+    </div>
+    <div class="section-title">Constitution</div>
+    <div class="section">
+      <ul>
+        <li>The 2/3 league vote will be used if anything must be decided. All members in the league must vote!</li>
+        <li>The league will operate within the guidance of the Sleeper platform.</li>
+        <li><b>Keepers:</b> Each team can choose 3 keeper players from their team's prior years roster.</li>
+        <li>The first year's keeper fee is $5+ draft capital, followed by a second year's fee of $5+ draft capital. Minimum keeper base starts at $5 when calculating cost.</li>
+        <li>Waiver pickups can be kept for double the waiver price plus the keeper fee. If a player is traded or dropped, the base for keeping them is at their highest value. Minimum waiver pickup keeper cost starts at $10.</li>
+        <li>Players drafted, dropped/traded, and picked up again in the same year will not reset the keeper year count.</li>
+        <li>Player must be on the team prior to the final game of week 11 and for the remainder of the season to be keeper eligible. Player must have played at least 1 game to be keeper eligible.</li>
+        <li>Keepers must be identified a week before the next draft.</li>
+        <li><b>League Structure:</b> Each team will have 15 roster spots: 1 QB, 2 RB, 2 WR, 1 RB/WR, 1 TE, 1 K, 1 DEF, 1 IR, 5 Bench spots.</li>
+        <li>Standings tie breakers goes to points for (to lessen the effect of having a tougher schedule than other teams).</li>
+        <li>Playoffs start week 15 with 6 teams and the championship week 17.</li>
+      </ul>
+    </div>
+    <div class="section-title">Payouts</div>
+    <div class="section">
+      <ul>
+        <li><b>Buy-in:</b> $150 </li>
+        <li><b>Apple Pay:</b> 915-206-0948 &nbsp; | &nbsp; <b>Venmo:</b> @chrisrivera17</li>
+      </ul>
+      <b>Payouts:</b>
+      <ul>
+        <li>1st Place: $1,200</li>
+        <li>2nd Place: $400</li>
+        <li>3rd Place: $150</li>
+        <li>4th Place: $50</li>
+      </ul>
+      <b>Toilet Bowl:</b>
+      <ul>
+        <li>1st: $20 draft capital</li>
+        <li>2nd: $10 draft capital</li>
+        <li>3rd: $5 draft capital</li>
+      </ul>
+    </div>
+    <h2 style="margin-top:20px;">🔥 Owners 🔥</h2>
+    <div class="topfriends" id="owner-gallery"></div>
+    <div id="keeper-display"></div>
+  </div>
+<script>
+// Overlay logic for "press play to enter"
+function startSite() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+  var audio = document.getElementById('audioPlayer');
+  audio.play();
+}
+// List of manager usernames for icons (matches your keeper data)
+const owners = [
+    "rulis", "Dirtymac2", "ItzNacha", "Juan2Three", "Monsy", "cdrivera3",
+  "erikglinde13", "faperez23", "jdparsont", "matt4508", "mawki", "DannyTheGoat30"
+];
+// Your keeper data (trimmed for length)
+const keepersData = [
+  {"Owner":"DannyTheGoat30","Player":"A.J. Brown","KeeperYear":0,"Cost":54},
+  {"Owner":"DannyTheGoat30","Player":"Chase Brown","KeeperYear":0,"Cost":17},
+  {"Owner":"DannyTheGoat30","Player":"Jahmyr Gibbs","KeeperYear":1,"Cost":54},
+  {"Owner":"DannyTheGoat30","Player":"James Cook","KeeperYear":1,"Cost":37},
+  {"Owner":"DannyTheGoat30","Player":"Jameson Williams","KeeperYear":0,"Cost":15},
+  {"Owner":"DannyTheGoat30","Player":"Joe Burrow","KeeperYear":1,"Cost":10},
+  {"Owner":"DannyTheGoat30","Player":"Malik Nabers","KeeperYear":0,"Cost":27},
+  {"Owner":"DannyTheGoat30","Player":"Nico Collins","KeeperYear":1,"Cost":20},
+  {"Owner":"DannyTheGoat30","Player":"Ray Davis","KeeperYear":0,"Cost":15},
+  {"Owner":"DannyTheGoat30","Player":"Travis Kelce","KeeperYear":0,"Cost":27},
+  {"Owner":"Dirtymac2","Player":"D'Andre Swift","KeeperYear":0,"Cost":23},
+  {"Owner":"Dirtymac2","Player":"De'Von Achane","KeeperYear":1,"Cost":20},
+  {"Owner":"Dirtymac2","Player":"DeAndre Hopkins","KeeperYear":1,"Cost":15},
+  {"Owner":"Dirtymac2","Player":"Deebo Samuel","KeeperYear":0,"Cost":37},
+  {"Owner":"Dirtymac2","Player":"George Kittle","KeeperYear":0,"Cost":27},
+  {"Owner":"Dirtymac2","Player":"Jared Goff","KeeperYear":0,"Cost":10},
+  {"Owner":"Dirtymac2","Player":"Lamar Jackson","KeeperYear":0,"Cost":28},
+  {"Owner":"Dirtymac2","Player":"Puka Nacua","KeeperYear":0,"Cost":46},
+  {"Owner":"Dirtymac2","Player":"Tank Bigsby","KeeperYear":0,"Cost":61},
+  {"Owner":"Dirtymac2","Player":"Zach Charbonnet","KeeperYear":0,"Cost":15},
+  {"Owner":"ItzNacha","Player":"Brock Purdy","KeeperYear":0,"Cost":10},
+  {"Owner":"ItzNacha","Player":"Chris Olave","KeeperYear":0,"Cost":29},
+  {"Owner":"ItzNacha","Player":"Courtland Sutton","KeeperYear":1,"Cost":15},
+  {"Owner":"ItzNacha","Player":"David Montgomery","KeeperYear":0,"Cost":21},
+  {"Owner":"ItzNacha","Player":"Isiah Pacheco","KeeperYear":1,"Cost":24},
+  {"Owner":"ItzNacha","Player":"Jordan Addison","KeeperYear":0,"Cost":10},
+  {"Owner":"ItzNacha","Player":"KC","KeeperYear":0,"Cost":10},
+  {"Owner":"ItzNacha","Player":"Stefon Diggs","KeeperYear":0,"Cost":22},
+  {"Owner":"Juan2Three","Player":"CeeDee Lamb","KeeperYear":1,"Cost":45},
+  {"Owner":"Juan2Three","Player":"Dalton Kincaid","KeeperYear":0,"Cost":19},
+  {"Owner":"Juan2Three","Player":"Gus Edwards","KeeperYear":0,"Cost":15},
+  {"Owner":"Juan2Three","Player":"James Conner","KeeperYear":0,"Cost":33},
+  {"Owner":"Juan2Three","Player":"Jauan Jennings","KeeperYear":0,"Cost":45},
+  {"Owner":"Juan2Three","Player":"Justin Herbert","KeeperYear":0,"Cost":15},
+  {"Owner":"Juan2Three","Player":"Ladd McConkey","KeeperYear":0,"Cost":11},
+  {"Owner":"Juan2Three","Player":"Rachaad White","KeeperYear":1,"Cost":29},
+  {"Owner":"Juan2Three","Player":"T.J. Hockenson","KeeperYear":0,"Cost":10},
+  {"Owner":"Juan2Three","Player":"Xavier Legette","KeeperYear":0,"Cost":10},
+  {"Owner":"Monsy","Player":"Bo Nix","KeeperYear":0,"Cost":15},
+  {"Owner":"Monsy","Player":"Chuba Hubbard","KeeperYear":0,"Cost":10},
+  {"Owner":"Monsy","Player":"DEN","KeeperYear":0,"Cost":27},
+  {"Owner":"Monsy","Player":"Jonathan Taylor","KeeperYear":1,"Cost":55},
+  {"Owner":"Monsy","Player":"Jonnu Smith","KeeperYear":0,"Cost":15},
+  {"Owner":"Monsy","Player":"Kendre Miller","KeeperYear":0,"Cost":15},
+  {"Owner":"Monsy","Player":"Najee Harris","KeeperYear":0,"Cost":20},
+  {"Owner":"Monsy","Player":"Rome Odunze","KeeperYear":0,"Cost":19},
+  {"Owner":"Monsy","Player":"Tony Pollard","KeeperYear":0,"Cost":13},
+  {"Owner":"Monsy","Player":"Zay Flowers","KeeperYear":0,"Cost":20},
+  {"Owner":"cdrivera3","Player":"Bijan Robinson","KeeperYear":1,"Cost":83},
+  {"Owner":"cdrivera3","Player":"Derrick Henry","KeeperYear":0,"Cost":72},
+  {"Owner":"cdrivera3","Player":"Isaac Guerendo","KeeperYear":0,"Cost":15},
+  {"Owner":"cdrivera3","Player":"Jalen Hurts","KeeperYear":1,"Cost":25},
+  {"Owner":"cdrivera3","Player":"Jaxon Smith-Njigba","KeeperYear":0,"Cost":165},
+  {"Owner":"cdrivera3","Player":"Justice Hill","KeeperYear":0,"Cost":15},
+  {"Owner":"cdrivera3","Player":"Khalil Shakir","KeeperYear":0,"Cost":10},
+  {"Owner":"cdrivera3","Player":"Michael Pittman","KeeperYear":0,"Cost":18},
+  {"Owner":"cdrivera3","Player":"PHI","KeeperYear":2,"Cost":15},
+  {"Owner":"cdrivera3","Player":"Rashee Rice","KeeperYear":0,"Cost":15},
+  {"Owner":"cdrivera3","Player":"Sam LaPorta","KeeperYear":1,"Cost":29},
+  {"Owner":"cdrivera3","Player":"Saquon Barkley","KeeperYear":0,"Cost":69},
+  {"Owner":"erikglinde13","Player":"Aaron Jones","KeeperYear":0,"Cost":23},
+  {"Owner":"erikglinde13","Player":"Adam Thielen","KeeperYear":0,"Cost":15},
+  {"Owner":"erikglinde13","Player":"David Njoku","KeeperYear":0,"Cost":37},
+  {"Owner":"erikglinde13","Player":"Drake London","KeeperYear":2,"Cost":20},
+  {"Owner":"erikglinde13","Player":"Jerry Jeudy","KeeperYear":0,"Cost":15},
+  {"Owner":"erikglinde13","Player":"Jordan Love","KeeperYear":0,"Cost":16},
+  {"Owner":"erikglinde13","Player":"Josh Downs","KeeperYear":0,"Cost":57},
+  {"Owner":"erikglinde13","Player":"Justin Jefferson","KeeperYear":1,"Cost":53},
+  {"Owner":"erikglinde13","Player":"MIN","KeeperYear":0,"Cost":21},
+  {"Owner":"erikglinde13","Player":"Nick Chubb","KeeperYear":0,"Cost":15},
+  {"Owner":"erikglinde13","Player":"Rhamondre Stevenson","KeeperYear":0,"Cost":35},
+  {"Owner":"erikglinde13","Player":"Sam Darnold","KeeperYear":0,"Cost":27},
+  {"Owner":"faperez23","Player":"Alexander Mattison","KeeperYear":0,"Cost":15},
+  {"Owner":"faperez23","Player":"Alvin Kamara","KeeperYear":0,"Cost":46},
+  {"Owner":"faperez23","Player":"C.J. Stroud","KeeperYear":0,"Cost":16},
+  {"Owner":"faperez23","Player":"Christian McCaffrey","KeeperYear":1,"Cost":82},
+  {"Owner":"faperez23","Player":"Dallas Goedert","KeeperYear":0,"Cost":10},
+  {"Owner":"faperez23","Player":"Jakobi Meyers","KeeperYear":0,"Cost":15},
+  {"Owner":"faperez23","Player":"Keenan Allen","KeeperYear":0,"Cost":22},
+  {"Owner":"faperez23","Player":"Marquez Valdes-Scantling","KeeperYear":0,"Cost":15},
+  {"Owner":"faperez23","Player":"Matthew Stafford","KeeperYear":0,"Cost":15},
+  {"Owner":"faperez23","Player":"Rico Dowdle","KeeperYear":0,"Cost":10},
+  {"Owner":"faperez23","Player":"SF","KeeperYear":0,"Cost":15},
+  {"Owner":"faperez23","Player":"Tyler Lockett","KeeperYear":0,"Cost":10},
+  {"Owner":"faperez23","Player":"Xavier Worthy","KeeperYear":0,"Cost":10},
+  {"Owner":"jdparsont","Player":"Amari Cooper","KeeperYear":0,"Cost":23},
+  {"Owner":"jdparsont","Player":"Davante Adams","KeeperYear":0,"Cost":33},
+  {"Owner":"jdparsont","Player":"Ja'Marr Chase","KeeperYear":0,"Cost":29},
+  {"Owner":"jdparsont","Player":"Jayden Daniels","KeeperYear":0,"Cost":10},
+  {"Owner":"jdparsont","Player":"Jaylen Warren","KeeperYear":0,"Cost":29},
+  {"Owner":"jdparsont","Player":"Kenneth Walker","KeeperYear":1,"Cost":23},
+  {"Owner":"jdparsont","Player":"Kyren Williams","KeeperYear":0,"Cost":74},
+  {"Owner":"jdparsont","Player":"Terry McLaurin","KeeperYear":0,"Cost":22},
+  {"Owner":"jdparsont","Player":"Trey McBride","KeeperYear":1,"Cost":20},
+  {"Owner":"matt4508","Player":"Braelon Allen","KeeperYear":0,"Cost":10},
+  {"Owner":"matt4508","Player":"Breece Hall","KeeperYear":2,"Cost":33},
+  {"Owner":"matt4508","Player":"Bucky Irving","KeeperYear":0,"Cost":15},
+  {"Owner":"matt4508","Player":"DJ Moore","KeeperYear":0,"Cost":31},
+  {"Owner":"matt4508","Player":"DK Metcalf","KeeperYear":0,"Cost":30},
+  {"Owner":"matt4508","Player":"Kyler Murray","KeeperYear":1,"Cost":20},
+  {"Owner":"matt4508","Player":"Mark Andrews","KeeperYear":1,"Cost":28},
+  {"Owner":"matt4508","Player":"Marvin Harrison","KeeperYear":0,"Cost":42},
+  {"Owner":"matt4508","Player":"Mike Evans","KeeperYear":0,"Cost":28},
+  {"Owner":"matt4508","Player":"Tee Higgins","KeeperYear":0,"Cost":22},
+  {"Owner":"matt4508","Player":"Tucker Kraft","KeeperYear":0,"Cost":19},
+  {"Owner":"mawki","Player":"Amon-Ra St. Brown","KeeperYear":0,"Cost":24},
+  {"Owner":"mawki","Player":"Brian Thomas","KeeperYear":0,"Cost":11},
+  {"Owner":"mawki","Player":"Brock Bowers","KeeperYear":0,"Cost":11},
+  {"Owner":"mawki","Player":"Calvin Ridley","KeeperYear":0,"Cost":21},
+  {"Owner":"mawki","Player":"DeVonta Smith","KeeperYear":0,"Cost":24},
+  {"Owner":"mawki","Player":"George Pickens","KeeperYear":0,"Cost":18},
+  {"Owner":"mawki","Player":"Javonte Williams","KeeperYear":0,"Cost":17},
+  {"Owner":"mawki","Player":"PIT","KeeperYear":1,"Cost":15},
+  {"Owner":"mawki","Player":"Patrick Mahomes","KeeperYear":0,"Cost":34},
+  {"Owner":"mawki","Player":"Russell Wilson","KeeperYear":0,"Cost":15},
+  {"Owner":"mawki","Player":"Travis Etienne","KeeperYear":0,"Cost":47},
+  {"Owner":"mawki","Player":"Tyrone Tracy","KeeperYear":0,"Cost":15},
+  {"Owner":"rulis","Player":"Baker Mayfield","KeeperYear":0,"Cost":35},
+  {"Owner":"rulis","Player":"Cade Otton","KeeperYear":0,"Cost":17},
+  {"Owner":"rulis","Player":"Jake Ferguson","KeeperYear":0,"Cost":14},
+  {"Owner":"rulis","Player":"Jayden Reed","KeeperYear":1,"Cost":20},
+  {"Owner":"rulis","Player":"Jaylen Waddle","KeeperYear":2,"Cost":35},
+  {"Owner":"rulis","Player":"Joe Mixon","KeeperYear":0,"Cost":40},
+  {"Owner":"rulis","Player":"Jonathon Brooks","KeeperYear":0,"Cost":10},
+  {"Owner":"rulis","Player":"Josh Jacobs","KeeperYear":1,"Cost":59},
+  {"Owner":"rulis","Player":"Keon Coleman","KeeperYear":0,"Cost":27},
+  {"Owner":"rulis","Player":"Tank Dell","KeeperYear":0,"Cost":24},
+  {"Owner":"rulis","Player":"Trey Benson","KeeperYear":0,"Cost":15}
+];
+
+// Render avatars
+const gallery = document.getElementById('owner-gallery');
+owners.forEach(owner => {
+  const div = document.createElement('div');
+  div.className = 'friend';
+  div.innerHTML = `<img src="https://robohash.org/${owner}?set=set2&size=80x80" alt="${owner}"><span>${owner}</span>`;
+  div.onclick = () => showKeepers(owner);
+  gallery.appendChild(div);
+});
+
+function showKeepers(owner) {
+  const box = document.getElementById('keeper-display');
+  const ownerKeepers = keepersData.filter(k => k.Owner === owner);
+  if (ownerKeepers.length === 0) {
+    box.innerHTML = `<div class="no-keepers">${owner} has no eligible keepers this year.</div>`;
+    return;
+  }
+  let table = `<table id="keeper-table" style="display:table;">
+    <caption>${owner}'s Keeper-Eligible Players</caption>
+    <tr><th>Player</th><th>Years Kept</th><th>2025 Keeper Cost</th></tr>`;
+  ownerKeepers.forEach(k => {
+    table += `<tr>
+      <td>${k.Player}</td>
+      <td>${k.KeeperYear}</td>
+      <td>$${k.Cost}</td>
+    </tr>`;
+  });
+  table += '</table>';
+  box.innerHTML = table;
+}
+</script>
+</body>
+</html>
+"""
+
+with open("taco_league_myspace.html", "w", encoding="utf-8") as f:
+    f.write(html)
+
+print("DONE! Open 'taco_league_myspace.html' in your browser. Anthem, info, clickable owners, and keeper popup all included!")
+
+Initial website commit
