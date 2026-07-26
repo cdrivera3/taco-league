@@ -1,534 +1,1188 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <title>Taco League</title>
-  
-<style>
-  :root {
-    --bg: #f5f1e8;
-    --surface: #fffdf8;
-    --surface-2: #efe7da;
-    --text: #2d2925;
-    --muted: #6f665e;
-    --accent: #b95c3d;
-    --accent-dark: #8f402b;
-    --accent-soft: #ead2c8;
-    --sage: #66745f;
-    --border: #d8cec0;
-    --shadow: 0 18px 45px rgba(63, 48, 35, 0.12);
-  }
+import os
+import time
+from collections import defaultdict
 
-  * {
-    box-sizing: border-box;
-  }
+import pandas as pd
+import requests
+from IPython.display import FileLink, display
 
-  body {
-    margin: 0;
-    padding: 28px 16px 60px;
-    background:
-      radial-gradient(circle at top left, rgba(185, 92, 61, 0.08), transparent 32%),
-      linear-gradient(180deg, #f8f4ed 0%, var(--bg) 100%);
-    color: var(--text);
-    font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
-      "Segoe UI", sans-serif;
-  }
 
-  .mainbox {
-    width: min(1040px, 100%);
-    margin: 0 auto;
-    padding: 38px;
-    background: rgba(255, 253, 248, 0.96);
-    border: 1px solid var(--border);
-    border-radius: 24px;
-    box-shadow: var(--shadow);
-  }
+# ============================================================
+# SETTINGS
+# ============================================================
 
-  h1 {
-    margin: 0 0 14px;
-    color: var(--text);
-    font-size: clamp(2.2rem, 6vw, 4rem);
-    line-height: 1;
-    text-align: center;
-    letter-spacing: -0.05em;
-    font-weight: 850;
-  }
-
-  h1::after {
-    content: "";
-    display: block;
-    width: 72px;
-    height: 5px;
-    margin: 18px auto 0;
-    border-radius: 999px;
-    background: var(--accent);
-  }
-
-  .marquee {
-    margin: 28px 0 34px;
-    padding: 18px 22px;
-    background: var(--accent-soft);
-    color: var(--accent-dark);
-    border: 1px solid #dfb7a8;
-    border-radius: 14px;
-    text-align: center;
-    font-size: 1.08rem !important;
-    font-weight: 750;
-    line-height: 1.5;
-  }
-
-  .section-title {
-    width: auto;
-    margin: 36px 0 12px;
-    padding: 0;
-    border: 0;
-    color: var(--text);
-    font-size: 1.55rem;
-    font-weight: 800;
-    letter-spacing: -0.02em;
-    text-shadow: none;
-    font-family: inherit;
-  }
-
-  .section {
-    margin: 0 0 22px;
-    padding: 26px 30px;
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: none;
-    color: var(--text);
-    font-size: 1.03rem;
-    line-height: 1.72;
-  }
-
-  ul {
-    margin: 0;
-    padding-left: 1.35rem;
-  }
-
-  li {
-    margin: 0 0 12px;
-    color: var(--text);
-    font-size: 1rem;
-    line-height: 1.65;
-  }
-
-  li:last-child {
-    margin-bottom: 0;
-  }
-
-  .section > b,
-  .section li > b:first-child {
-    display: block;
-    margin: 8px 0 10px;
-    text-align: center;
-    color: var(--accent-dark);
-    font-size: 1.08rem;
-    font-weight: 850;
-    letter-spacing: 0.01em;
-  }
-
-  .section li > b:first-child {
-    margin-top: 2px;
-  }
-
-  .topfriends {
-    margin: 0 0 34px;
-    padding: 22px;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(128px, 1fr));
-    gap: 18px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 18px;
-    box-shadow: none;
-  }
-
-  .friend {
-    position: relative;
-    width: 100%;
-    padding: 14px 10px 12px;
-    text-align: center;
-    cursor: pointer;
-    border: 1px solid transparent;
-    border-radius: 14px;
-    transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
-  }
-
-  .capital-badge {
-    position: absolute;
-    top: 4px;
-    right: 7px;
-    min-width: 42px;
-    padding: 5px 8px;
-    border: 2px solid var(--surface);
-    border-radius: 999px;
-    background: var(--accent);
-    color: #fff;
-    font-size: 0.82rem;
-    font-weight: 900;
-    line-height: 1;
-    box-shadow: 0 4px 12px rgba(92, 52, 38, 0.28);
-    transform: rotate(5deg);
-    z-index: 2;
-  }
-
-  .friend:hover {
-    transform: translateY(-3px);
-    border-color: var(--border);
-    background: #faf6ef;
-  }
-
-  .friend img {
-    width: 76px;
-    height: 76px;
-    margin: 0 auto 10px;
-    display: block;
-    border-radius: 50%;
-    border: 3px solid var(--surface);
-    background: var(--accent-soft);
-    box-shadow: 0 0 0 2px var(--accent);
-    transition: none;
-  }
-
-  .friend img:hover {
-    transform: none;
-    border-color: var(--surface);
-  }
-
-  .friend span {
-    display: block;
-    width: 100%;
-    padding: 0;
-    color: var(--text);
-    background: transparent;
-    border-radius: 0;
-    font-size: 0.92rem;
-    font-weight: 750;
-    letter-spacing: 0;
-    line-height: 1.25;
-    overflow-wrap: anywhere;
-  }
-
-  #keeper-table {
-    width: 100%;
-    margin-top: 12px;
-    border-collapse: separate;
-    border-spacing: 0;
-    overflow: hidden;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    box-shadow: none;
-    display: none;
-  }
-
-  #keeper-table caption {
-    padding: 0 0 14px;
-    color: var(--text);
-    font-size: 1.45rem;
-    font-weight: 850;
-    text-align: left;
-  }
-
-  #keeper-table th,
-  #keeper-table td {
-    padding: 13px 14px;
-    border-bottom: 1px solid var(--border);
-    font-size: 0.95rem;
-    text-align: left;
-  }
-
-  #keeper-table th {
-    background: var(--sage);
-    color: white;
-    font-weight: 750;
-  }
-
-  #keeper-table td {
-    color: var(--text);
-    background: var(--surface);
-  }
-
-  #keeper-table tr:nth-child(even) td {
-    background: #faf7f1;
-  }
-
-  #keeper-table tr:last-child td {
-    border-bottom: 0;
-  }
-
-  .no-keepers {
-    margin: 26px 0 0;
-    padding: 18px;
-    color: var(--muted);
-    background: var(--surface-2);
-    border: 1px solid var(--border);
-    border-radius: 14px;
-    text-align: center;
-    font-size: 1rem;
-  }
-
-  .polls-section {
-    padding: 22px 26px;
-  }
-
-  .polls-note {
-    margin-bottom: 16px;
-    color: var(--muted);
-    text-align: center;
-    font-weight: 700;
-  }
-
-  .poll-list {
-    display: grid;
-    gap: 10px;
-  }
-
-  .poll-row {
-    display: flex;
-    justify-content: space-between;
-    gap: 18px;
-    padding: 13px 15px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-  }
-
-  .poll-name {
-    font-weight: 750;
-  }
-
-  .poll-result {
-    flex: 0 0 auto;
-    color: var(--accent-dark);
-    font-weight: 850;
-  }
-
-  @media (max-width: 760px) {
-    body {
-      padding: 14px 10px 40px;
-    }
-
-    .mainbox {
-      padding: 24px 16px;
-      border-radius: 18px;
-    }
-
-    .section {
-      padding: 20px 18px;
-    }
-
-    .topfriends {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      padding: 14px;
-    }
-
-    #keeper-table {
-      display: block !important;
-      overflow-x: auto;
-      white-space: nowrap;
-    }
-
-    #keeper-table caption {
-      white-space: normal;
-    }
-
-    .poll-row {
-      display: block;
-      text-align: center;
-    }
-
-    .poll-result {
-      display: block;
-      margin-top: 5px;
-    }
-  }
-</style>
-
-</head>
-<body>
-  <div class="mainbox" id="mainContent">
-    <h1>🌮 Taco League 🌮</h1>
-    <div class="marquee" style="font-size:2em; padding:20px 10px; text-align:center;">
-      Draft is August 23, 2026. Keepers and buy-in are due August 9, 2026.
-    </div>
-    <div class="section-title">Constitution</div>
-    <div class="section">
-      <ul>
-        <li>The 2/3 league vote will be used if anything must be decided. All members in the league must vote!</li>
-        <li>The league will operate within the guidance of the Sleeper platform.</li>
-      </ul>
-
-      <b>Keepers</b>
-      <ul>
-        <li>Each team can choose three keeper players from their team's prior year's roster.</li>
-        <li><em>*The keeper function can only be used on a player two times consecutively.*</em></li>
-        <li>The first year's keeper fee is $5 plus draft capital, followed by a second year's fee of $5 plus draft capital. The minimum keeper base starts at $5 when calculating cost.</li>
-        <li>Waiver pickups can be kept for double the waiver price plus the keeper fee. If a player is traded or dropped, the base for keeping them is at their highest value. Minimum waiver pickup keeper cost starts at $10.</li>
-        <li>Players drafted, dropped or traded, and picked up again in the same year will not reset the keeper year count.</li>
-        <li>A player must be on the team prior to the final game of Week 11 and remain there for the rest of the season to be keeper eligible. The player must have played at least one game.</li>
-      </ul>
-
-      <b>Pre-Draft Trading</b>
-      <ul>
-        <li>Each team's three keepers must first be selected, locked, and paid for. After keepers lock, those players may be traded before the draft, along with any amount of auction draft capital agreed upon by the teams involved.</li>
-      </ul>
-
-      <b>League Structure</b>
-      <ul>
-        <li>Each team will have 15 roster spots: 1 QB, 2 RB, 2 WR, 1 RB/WR, 1 TE, 1 DEF, 1 IR, and 5 bench spots.</li>
-        <li>Standings tiebreakers go to points for.</li>
-        <li>Playoffs start in Week 15 with 6 teams, and the championship is in Week 17.</li>
-      </ul>
-    </div>
-    <div class="section-title">Payouts</div>
-    <div class="section">
-      <b>Buy-In</b>
-      <ul>
-        <li>$150</li>
-      </ul>
-      <b>Payouts</b>
-      <ul>
-        <li>1st Place: $1,200</li>
-        <li>2nd Place: $400</li>
-        <li>3rd Place: $150</li>
-        <li>4th Place: $50</li>
-      </ul>
-      <b>Toilet Bowl</b>
-      <ul>
-        <li>1st: $20 draft capital</li>
-        <li>2nd: $10 draft capital</li>
-        <li>3rd: $5 draft capital</li>
-      </ul>
-    </div>
-    <div class="section-title">Owners</div>
-    <div class="topfriends" id="owner-gallery"></div>
-    <div id="keeper-display"></div>
-
-    <div class="section-title">Polls</div>
-    <div class="section polls-section">
-      <div class="polls-note">
-        Last updated July 26, 2026. Polls close when keepers are locked.
-      </div>
-      <div class="poll-list">
-        <div class="poll-row">
-          <span class="poll-name">Additional IR Slot</span>
-          <span class="poll-result">5 Yes · 7 No</span>
-        </div>
-        <div class="poll-row">
-          <span class="poll-name">Remove Flex Spot</span>
-          <span class="poll-result">7 Yes · 5 No</span>
-        </div>
-        <div class="poll-row">
-          <span class="poll-name">Add Kickers</span>
-          <span class="poll-result">5 Yes · 7 No</span>
-        </div>
-        <div class="poll-row">
-          <span class="poll-name">Median Scoring</span>
-          <span class="poll-result">7 Yes · 5 No</span>
-        </div>
-        <div class="poll-row">
-          <span class="poll-name">Allow an Owner to Use the Keeper Function on a Player Three Years in a Row</span>
-          <span class="poll-result">7 Yes · 4 No <em>*Remove your double votes*</em></span>
-        </div>
-      </div>
-    </div>
-  </div>
-<script>
-const keepersData = [{"Owner":"DannyTheGoat30","Player":"Caleb Williams","Team":"CHI","Position":"QB","PlayerID":"11560","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Patrick Mahomes","Team":"KC","Position":"QB","PlayerID":"4046","KeeperYear":1,"AuctionValue":14.0,"DraftKeepCost":19.0,"WaiverKeepCost":null,"Cost":19.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Ashton Jeanty","Team":"LV","Position":"RB","PlayerID":"12527","KeeperYear":1,"AuctionValue":66.0,"DraftKeepCost":71.0,"WaiverKeepCost":null,"Cost":71.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"RJ Harvey","Team":"DEN","Position":"RB","PlayerID":"12489","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":null,"Cost":35.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Harold Fannin","Team":"CLE","Position":"TE","PlayerID":"12506","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":49.0,"Cost":49.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Jake Ferguson","Team":"DAL","Position":"TE","PlayerID":"8110","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Brian Thomas","Team":"JAX","Position":"WR","PlayerID":"11631","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Chris Olave","Team":"NO","Position":"WR","PlayerID":"8144","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"DeVonta Smith","Team":"PHI","Position":"WR","PlayerID":"7525","KeeperYear":1,"AuctionValue":19.0,"DraftKeepCost":24.0,"WaiverKeepCost":null,"Cost":24.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Jordan Addison","Team":"MIN","Position":"WR","PlayerID":"9756","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":null,"Cost":11.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Stefon Diggs","Team":"","Position":"WR","PlayerID":"2449","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Seattle Seahawks","Team":"SEA","Position":"DEF","PlayerID":"SEA","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":17.0,"Cost":17.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Drake Maye","Team":"NE","Position":"QB","PlayerID":"11564","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Lamar Jackson","Team":"BAL","Position":"QB","PlayerID":"4881","KeeperYear":2,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Devin Singletary","Team":"NYG","Position":"RB","PlayerID":"6130","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"James Conner","Team":"ARI","Position":"RB","PlayerID":"4137","KeeperYear":1,"AuctionValue":26.0,"DraftKeepCost":31.0,"WaiverKeepCost":null,"Cost":31.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Kareem Hunt","Team":"","Position":"RB","PlayerID":"4098","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Saquon Barkley","Team":"PHI","Position":"RB","PlayerID":"4866","KeeperYear":1,"AuctionValue":69.0,"DraftKeepCost":74.0,"WaiverKeepCost":null,"Cost":74.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Tyrone Tracy","Team":"NYG","Position":"RB","PlayerID":"11655","KeeperYear":1,"AuctionValue":13.0,"DraftKeepCost":18.0,"WaiverKeepCost":null,"Cost":18.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Dallas Goedert","Team":"PHI","Position":"TE","PlayerID":"5022","KeeperYear":1,"AuctionValue":3.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"CeeDee Lamb","Team":"DAL","Position":"WR","PlayerID":"6786","KeeperYear":1,"AuctionValue":45.0,"DraftKeepCost":50.0,"WaiverKeepCost":null,"Cost":50.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Khalil Shakir","Team":"BUF","Position":"WR","PlayerID":"8134","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Puka Nacua","Team":"LAR","Position":"WR","PlayerID":"9493","KeeperYear":2,"AuctionValue":46.0,"DraftKeepCost":51.0,"WaiverKeepCost":null,"Cost":51.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"David Montgomery","Team":"HOU","Position":"RB","PlayerID":"5892","KeeperYear":2,"AuctionValue":21.0,"DraftKeepCost":26.0,"WaiverKeepCost":null,"Cost":26.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Jaylen Warren","Team":"PIT","Position":"RB","PlayerID":"8228","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Quinshon Judkins","Team":"CLE","Position":"RB","PlayerID":"12512","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"TreVeyon Henderson","Team":"NE","Position":"RB","PlayerID":"12529","KeeperYear":1,"AuctionValue":43.0,"DraftKeepCost":48.0,"WaiverKeepCost":null,"Cost":48.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Brock Bowers","Team":"LV","Position":"TE","PlayerID":"11604","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Marvin Harrison","Team":"ARI","Position":"WR","PlayerID":"11628","KeeperYear":1,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Rashee Rice","Team":"KC","Position":"WR","PlayerID":"10229","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Tee Higgins","Team":"CIN","Position":"WR","PlayerID":"6801","KeeperYear":1,"AuctionValue":23.0,"DraftKeepCost":28.0,"WaiverKeepCost":null,"Cost":28.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Denver Broncos","Team":"DEN","Position":"DEF","PlayerID":"DEN","KeeperYear":1,"AuctionValue":12.0,"DraftKeepCost":17.0,"WaiverKeepCost":21.0,"Cost":21.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Bo Nix","Team":"DEN","Position":"QB","PlayerID":"11563","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":25.0,"Cost":25.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Josh Allen","Team":"BUF","Position":"QB","PlayerID":"4984","KeeperYear":1,"AuctionValue":35.0,"DraftKeepCost":40.0,"WaiverKeepCost":null,"Cost":40.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Chase Brown","Team":"CIN","Position":"RB","PlayerID":"9224","KeeperYear":1,"AuctionValue":50.0,"DraftKeepCost":55.0,"WaiverKeepCost":null,"Cost":55.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Derrick Henry","Team":"BAL","Position":"RB","PlayerID":"3198","KeeperYear":1,"AuctionValue":60.0,"DraftKeepCost":65.0,"WaiverKeepCost":null,"Cost":65.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Kenneth Walker","Team":"KC","Position":"RB","PlayerID":"8151","KeeperYear":1,"AuctionValue":32.0,"DraftKeepCost":37.0,"WaiverKeepCost":null,"Cost":37.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Hunter Henry","Team":"NE","Position":"TE","PlayerID":"3214","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Tucker Kraft","Team":"GB","Position":"TE","PlayerID":"9484","KeeperYear":1,"AuctionValue":4.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Jaxon Smith-Njigba","Team":"SEA","Position":"WR","PlayerID":"9488","KeeperYear":1,"AuctionValue":31.0,"DraftKeepCost":36.0,"WaiverKeepCost":null,"Cost":36.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Ladd McConkey","Team":"LAC","Position":"WR","PlayerID":"11635","KeeperYear":2,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Brock Purdy","Team":"SF","Position":"QB","PlayerID":"8183","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Christian McCaffrey","Team":"SF","Position":"RB","PlayerID":"4034","KeeperYear":1,"AuctionValue":75.0,"DraftKeepCost":80.0,"WaiverKeepCost":null,"Cost":80.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Christian Watson","Team":"GB","Position":"WR","PlayerID":"8167","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Jauan Jennings","Team":"MIN","Position":"WR","PlayerID":"7049","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":41.0,"Cost":41.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Travis Hunter","Team":"JAX","Position":"WR","PlayerID":"12530","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":15.0,"Cost":20.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Wan'Dale Robinson","Team":"TEN","Position":"WR","PlayerID":"8126","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":79.0,"Cost":79.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Jaxson Dart","Team":"NYG","Position":"QB","PlayerID":"12508","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Breece Hall","Team":"NYJ","Position":"RB","PlayerID":"8155","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"D'Andre Swift","Team":"CHI","Position":"RB","PlayerID":"6790","KeeperYear":1,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"De'Von Achane","Team":"MIA","Position":"RB","PlayerID":"9226","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Isaiah Davis","Team":"NYJ","Position":"RB","PlayerID":"11571","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Tyler Allgeier","Team":"ARI","Position":"RB","PlayerID":"8132","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"A.J. Brown","Team":"NE","Position":"WR","PlayerID":"5859","KeeperYear":1,"AuctionValue":36.0,"DraftKeepCost":41.0,"WaiverKeepCost":null,"Cost":41.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Amon-Ra St. Brown","Team":"DET","Position":"WR","PlayerID":"7547","KeeperYear":1,"AuctionValue":24.0,"DraftKeepCost":29.0,"WaiverKeepCost":null,"Cost":29.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Zay Flowers","Team":"BAL","Position":"WR","PlayerID":"9997","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Dak Prescott","Team":"DAL","Position":"QB","PlayerID":"3294","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":61.0,"Cost":61.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Aaron Jones","Team":"MIN","Position":"RB","PlayerID":"4199","KeeperYear":2,"AuctionValue":23.0,"DraftKeepCost":28.0,"WaiverKeepCost":null,"Cost":28.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Kyle Monangai","Team":"CHI","Position":"RB","PlayerID":"12534","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":37.0,"Cost":37.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Kyren Williams","Team":"LAR","Position":"RB","PlayerID":"8150","KeeperYear":1,"AuctionValue":50.0,"DraftKeepCost":55.0,"WaiverKeepCost":null,"Cost":55.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Tyler Warren","Team":"IND","Position":"TE","PlayerID":"12518","KeeperYear":1,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Chris Godwin","Team":"TB","Position":"WR","PlayerID":"4037","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Jayden Reed","Team":"GB","Position":"WR","PlayerID":"10222","KeeperYear":1,"AuctionValue":3.0,"DraftKeepCost":10.0,"WaiverKeepCost":19.0,"Cost":19.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Jaylen Waddle","Team":"DEN","Position":"WR","PlayerID":"7526","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Luther Burden","Team":"CHI","Position":"WR","PlayerID":"12519","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Michael Pittman","Team":"PIT","Position":"WR","PlayerID":"6819","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Michael Wilson","Team":"ARI","Position":"WR","PlayerID":"10232","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Matthew Stafford","Team":"LAR","Position":"QB","PlayerID":"421","KeeperYear":2,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":35.0,"Cost":35.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Chuba Hubbard","Team":"CAR","Position":"RB","PlayerID":"7594","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Kimani Vidal","Team":"LAC","Position":"RB","PlayerID":"11647","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":35.0,"Cost":35.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Rico Dowdle","Team":"PIT","Position":"RB","PlayerID":"7021","KeeperYear":2,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Tony Pollard","Team":"TEN","Position":"RB","PlayerID":"5967","KeeperYear":1,"AuctionValue":13.0,"DraftKeepCost":18.0,"WaiverKeepCost":null,"Cost":18.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Zach Charbonnet","Team":"SEA","Position":"RB","PlayerID":"9753","KeeperYear":1,"AuctionValue":7.0,"DraftKeepCost":12.0,"WaiverKeepCost":null,"Cost":12.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Travis Kelce","Team":"KC","Position":"TE","PlayerID":"1466","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Emeka Egbuka","Team":"TB","Position":"WR","PlayerID":"12514","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Rome Odunze","Team":"CHI","Position":"WR","PlayerID":"11620","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Houston Texans","Team":"HOU","Position":"DEF","PlayerID":"HOU","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Jayden Daniels","Team":"WAS","Position":"QB","PlayerID":"11566","KeeperYear":2,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Javonte Williams","Team":"DAL","Position":"RB","PlayerID":"7588","KeeperYear":1,"AuctionValue":7.0,"DraftKeepCost":12.0,"WaiverKeepCost":null,"Cost":12.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Omarion Hampton","Team":"LAC","Position":"RB","PlayerID":"12507","KeeperYear":1,"AuctionValue":46.0,"DraftKeepCost":51.0,"WaiverKeepCost":null,"Cost":51.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Travis Etienne","Team":"NO","Position":"RB","PlayerID":"7543","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Woody Marks","Team":"HOU","Position":"RB","PlayerID":"12474","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":39.0,"Cost":39.0,"CostSource":"Waiver"},{"Owner":"jdparsont","Player":"Alec Pierce","Team":"IND","Position":"WR","PlayerID":"8142","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":45.0,"Cost":45.0,"CostSource":"Waiver"},{"Owner":"jdparsont","Player":"DJ Moore","Team":"BUF","Position":"WR","PlayerID":"4983","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":15.0,"Cost":20.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Deebo Samuel","Team":"","Position":"WR","PlayerID":"5872","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Drake London","Team":"ATL","Position":"WR","PlayerID":"8112","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Jameson Williams","Team":"DET","Position":"WR","PlayerID":"8148","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Terry McLaurin","Team":"WAS","Position":"WR","PlayerID":"5927","KeeperYear":2,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Bucky Irving","Team":"TB","Position":"RB","PlayerID":"11584","KeeperYear":2,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":null,"Cost":20.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Josh Jacobs","Team":"GB","Position":"RB","PlayerID":"5850","KeeperYear":1,"AuctionValue":52.0,"DraftKeepCost":57.0,"WaiverKeepCost":null,"Cost":57.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"George Kittle","Team":"SF","Position":"TE","PlayerID":"4217","KeeperYear":1,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Oronde Gadsden","Team":"LAC","Position":"TE","PlayerID":"12493","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"matt4508","Player":"Davante Adams","Team":"LAR","Position":"WR","PlayerID":"2133","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Ja'Marr Chase","Team":"CIN","Position":"WR","PlayerID":"7564","KeeperYear":1,"AuctionValue":29.0,"DraftKeepCost":34.0,"WaiverKeepCost":null,"Cost":34.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Jakobi Meyers","Team":"JAX","Position":"WR","PlayerID":"5947","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":null,"Cost":11.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Cleveland Browns","Team":"CLE","Position":"DEF","PlayerID":"CLE","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Baker Mayfield","Team":"TB","Position":"QB","PlayerID":"4892","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":49.0,"Cost":49.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Joe Burrow","Team":"CIN","Position":"QB","PlayerID":"6770","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":15.0,"Cost":35.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Bijan Robinson","Team":"ATL","Position":"RB","PlayerID":"9509","KeeperYear":1,"AuctionValue":83.0,"DraftKeepCost":88.0,"WaiverKeepCost":null,"Cost":88.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Blake Corum","Team":"LAR","Position":"RB","PlayerID":"11586","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"James Cook","Team":"BUF","Position":"RB","PlayerID":"8138","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":null,"Cost":35.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Dalton Kincaid","Team":"BUF","Position":"TE","PlayerID":"10236","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Darren Waller","Team":"","Position":"TE","PlayerID":"2505","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":47.0,"Cost":47.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Courtland Sutton","Team":"DEN","Position":"WR","PlayerID":"5045","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":null,"Cost":20.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"DK Metcalf","Team":"PIT","Position":"WR","PlayerID":"5846","KeeperYear":1,"AuctionValue":26.0,"DraftKeepCost":31.0,"WaiverKeepCost":null,"Cost":31.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Garrett Wilson","Team":"NYJ","Position":"WR","PlayerID":"8146","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"George Pickens","Team":"DAL","Position":"WR","PlayerID":"8137","KeeperYear":2,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Nico Collins","Team":"HOU","Position":"WR","PlayerID":"7569","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Pittsburgh Steelers","Team":"PIT","Position":"DEF","PlayerID":"PIT","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":15.0,"Cost":23.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Justin Herbert","Team":"LAC","Position":"QB","PlayerID":"6797","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":57.0,"Cost":57.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Cam Skattebo","Team":"NYG","Position":"RB","PlayerID":"12481","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":17.0,"Cost":17.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Jacory Croskey-Merritt","Team":"WAS","Position":"RB","PlayerID":"12533","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Tyjae Spears","Team":"TEN","Position":"RB","PlayerID":"9508","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Colston Loveland","Team":"CHI","Position":"TE","PlayerID":"12517","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Malik Nabers","Team":"NYG","Position":"WR","PlayerID":"11632","KeeperYear":1,"AuctionValue":27.0,"DraftKeepCost":32.0,"WaiverKeepCost":null,"Cost":32.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Quentin Johnston","Team":"LAC","Position":"WR","PlayerID":"9754","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":47.0,"Cost":47.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Ricky Pearsall","Team":"SF","Position":"WR","PlayerID":"11638","KeeperYear":1,"AuctionValue":14.0,"DraftKeepCost":19.0,"WaiverKeepCost":null,"Cost":19.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Romeo Doubs","Team":"NE","Position":"WR","PlayerID":"8121","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":37.0,"Cost":37.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Tetairoa McMillan","Team":"CAR","Position":"WR","PlayerID":"12526","KeeperYear":1,"AuctionValue":34.0,"DraftKeepCost":39.0,"WaiverKeepCost":null,"Cost":39.0,"CostSource":"Draft"}];
-
-const gallery = document.getElementById('owner-gallery');
-const keeperDisplay = document.getElementById('keeper-display');
-
-const extraDraftCapital = {
-  "mawki": 20,
-  "ItzNacha": 10,
-  "jdparsont": 5
-};
-
-function money(value) {
-  const number = Number(value);
-  return Number.isFinite(number)
-    ? number.toLocaleString('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 2
-      })
-    : '';
+LEAGUES = {
+    2022: "862172111907745792",
+    2023: "990123475421458432",
+    2024: "1121308465248542720",
+    2025: "1251342393802772480",
 }
 
-function renderOwners() {
-  gallery.innerHTML = '';
-  keeperDisplay.innerHTML = '';
+CURRENT_YEAR = 2025
 
-  const owners = [...new Set(
-    keepersData.map(row => row.Owner).filter(Boolean)
-  )].sort((a, b) => a.localeCompare(b));
+# Player must be on the same roster for all these weeks.
+KEEPER_WEEKS = list(range(11, 18))
 
-  owners.forEach(owner => {
-    const div = document.createElement('div');
-    div.className = 'friend';
-    const bonus = extraDraftCapital[owner];
+# Weeks used to retrieve waiver and free-agent transactions.
+TRANSACTION_WEEKS = range(1, 19)
 
-    div.innerHTML = `
-      ${bonus ? `<div class="capital-badge">+$${bonus}</div>` : ''}
-      <img src="https://robohash.org/${encodeURIComponent(owner)}?set=set2&size=80x80"
-           alt="${owner}">
-      <span>${owner}</span>
-    `;
-    div.onclick = () => showKeepers(owner);
-    gallery.appendChild(div);
-  });
+OUTPUT_FILE = "2026_keeper_values.xlsx"
 
-  if (owners.length > 0) {
-    showKeepers(owners[0]);
-  }
+BASE_URL = "https://api.sleeper.app/v1"
+TIMEOUT = 60
+
+session = requests.Session()
+api_cache = {}
+
+
+# ============================================================
+# GENERAL HELPERS
+# ============================================================
+
+def log(message=""):
+    print(message, flush=True)
+
+
+def get_json(url, description):
+    """Download JSON with progress, retries, and caching."""
+
+    if url in api_cache:
+        return api_cache[url]
+
+    log(f"Loading: {description}")
+    last_error = None
+
+    for attempt in range(1, 4):
+        try:
+            start = time.time()
+
+            response = session.get(
+                url,
+                timeout=TIMEOUT,
+            )
+            response.raise_for_status()
+
+            data = response.json()
+            api_cache[url] = data
+
+            count = (
+                len(data)
+                if isinstance(data, (list, dict))
+                else 0
+            )
+
+            log(
+                f"Completed: {description} — "
+                f"{count:,} records — "
+                f"{time.time() - start:.1f}s"
+            )
+
+            return data
+
+        except (
+            requests.RequestException,
+            ValueError,
+        ) as error:
+            last_error = error
+
+            if attempt < 3:
+                log(
+                    f"Attempt {attempt} failed. Retrying..."
+                )
+                time.sleep(attempt * 2)
+
+    raise RuntimeError(
+        f"Could not load {description}\n"
+        f"URL: {url}\n"
+        f"Error: {last_error}"
+    )
+
+
+def league_url(league_id, endpoint):
+    return f"{BASE_URL}/league/{league_id}/{endpoint}"
+
+
+def to_float(value, default=0.0):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return default
+
+
+def safe_width(series, column_name):
+    """Calculate Excel column width safely."""
+
+    lengths = series.apply(
+        lambda value: (
+            len(str(value))
+            if pd.notna(value)
+            else 0
+        )
+    )
+
+    data_width = (
+        int(lengths.max())
+        if not lengths.empty
+        else 0
+    )
+
+    return min(
+        max(data_width, len(str(column_name))) + 2,
+        40,
+    )
+
+
+# ============================================================
+# AUCTION VALUE
+# ============================================================
+
+def extract_auction(metadata):
+    """
+    Extract the auction price from Sleeper draft metadata.
+    """
+
+    if not isinstance(metadata, dict):
+        return 0.0
+
+    preferred_terms = (
+        "amount",
+        "auction",
+        "bid",
+        "price",
+        "cost",
+    )
+
+    # Check likely auction fields first.
+    for key, value in metadata.items():
+        key_text = str(key).lower()
+
+        if any(
+            term in key_text
+            for term in preferred_terms
+        ):
+            number = to_float(value, None)
+
+            if number is not None:
+                return number
+
+    # Preserve the fallback behavior from the original code.
+    for value in metadata.values():
+        number = to_float(value, None)
+
+        if number is not None:
+            return number
+
+    return 0.0
+
+
+# ============================================================
+# STEP 1: LOAD NFL PLAYER DATABASE
+# ============================================================
+
+log("=" * 70)
+log("STEP 1: Loading NFL player database")
+log("=" * 70)
+
+players = get_json(
+    f"{BASE_URL}/players/nfl",
+    "NFL player database",
+)
+
+
+def player_name(player_id):
+    player_id = str(player_id)
+    info = players.get(player_id, {})
+
+    if info.get("full_name"):
+        return info["full_name"]
+
+    first_name = info.get("first_name", "")
+    last_name = info.get("last_name", "")
+    combined = f"{first_name} {last_name}".strip()
+
+    return combined or player_id
+
+
+def player_team(player_id):
+    return players.get(
+        str(player_id),
+        {},
+    ).get("team", "")
+
+
+def player_position(player_id):
+    return players.get(
+        str(player_id),
+        {},
+    ).get("position", "")
+
+
+def games_played(player_id):
+    """
+    Sleeper's player database may not contain season game totals.
+    Missing values default to 1, matching the original code.
+    """
+
+    value = players.get(
+        str(player_id),
+        {},
+    ).get("games_played", 1)
+
+    try:
+        return int(value or 1)
+    except (TypeError, ValueError):
+        return 1
+
+
+# ============================================================
+# STEP 2: LOAD USERS AND ROSTERS
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 2: Loading users and rosters")
+log("=" * 70)
+
+users_by_year = {}
+rosters_by_year = {}
+roster_owner_by_year = {}
+
+for year, league_id in LEAGUES.items():
+    log(f"\nProcessing {year}")
+
+    users = get_json(
+        league_url(league_id, "users"),
+        f"{year} users",
+    )
+
+    users_by_year[year] = {
+        str(user["user_id"]): user.get(
+            "display_name",
+            "Unknown",
+        )
+        for user in users
+    }
+
+    rosters = get_json(
+        league_url(league_id, "rosters"),
+        f"{year} rosters",
+    )
+
+    rosters_by_year[year] = rosters
+
+    roster_owner_by_year[year] = {
+        roster["roster_id"]: str(roster["owner_id"])
+        for roster in rosters
+        if roster.get("owner_id") is not None
+    }
+
+
+# ============================================================
+# STEP 3: LOAD DRAFTS
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 3: Loading drafts")
+log("=" * 70)
+
+draft_picks_by_year = {}
+selected_drafts = {}
+
+
+def get_best_draft(year, league_id):
+    """
+    Select the draft with the most auction-priced picks.
+    """
+
+    drafts = get_json(
+        league_url(league_id, "drafts"),
+        f"{year} draft list",
+    )
+
+    if not drafts:
+        log(f"WARNING: No draft found for {year}")
+        return None, []
+
+    candidates = []
+
+    for number, draft in enumerate(drafts, start=1):
+        draft_id = draft.get("draft_id")
+
+        if not draft_id:
+            continue
+
+        picks = get_json(
+            f"{BASE_URL}/draft/{draft_id}/picks",
+            f"{year} draft candidate {number}",
+        )
+
+        priced_picks = sum(
+            extract_auction(
+                pick.get("metadata") or {}
+            ) > 0
+            for pick in picks
+        )
+
+        completed = int(
+            str(
+                draft.get("status", "")
+            ).lower() == "complete"
+        )
+
+        candidates.append({
+            "draft": draft,
+            "picks": picks,
+            "priced_picks": priced_picks,
+            "completed": completed,
+        })
+
+        log(
+            f"{year} candidate {number}: "
+            f"{len(picks):,} picks, "
+            f"{priced_picks:,} priced picks, "
+            f"status={draft.get('status', 'unknown')}"
+        )
+
+    if not candidates:
+        return None, []
+
+    best = max(
+        candidates,
+        key=lambda item: (
+            item["priced_picks"],
+            len(item["picks"]),
+            item["completed"],
+        ),
+    )
+
+    log(
+        f"Selected {year} draft: "
+        f"{best['draft'].get('draft_id')}"
+    )
+
+    return best["draft"], best["picks"]
+
+
+for year, league_id in LEAGUES.items():
+    draft, picks = get_best_draft(
+        year,
+        league_id,
+    )
+
+    selected_drafts[year] = draft
+    draft_picks_by_year[year] = picks
+
+
+# ============================================================
+# STEP 4: BUILD DRAFT HISTORY
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 4: Building draft history")
+log("=" * 70)
+
+draft_rows = []
+
+for year, picks in draft_picks_by_year.items():
+    users = users_by_year[year]
+    roster_owners = roster_owner_by_year[year]
+
+    for pick_number, pick in enumerate(
+        picks,
+        start=1,
+    ):
+        player_id = str(
+            pick.get("player_id", "")
+        )
+
+        owner_id = pick.get("picked_by")
+
+        if owner_id is not None:
+            owner_id = str(owner_id)
+
+        if not owner_id:
+            owner_id = roster_owners.get(
+                pick.get("roster_id")
+            )
+
+        draft_rows.append({
+            "Owner": users.get(
+                owner_id,
+                "Unknown",
+            ),
+            "Owner_ID": owner_id,
+            "Year": year,
+            "Round": pick.get("round", ""),
+            "Team": player_team(player_id),
+            "Position": player_position(player_id),
+            "Player": player_name(player_id),
+            "Player_ID": player_id,
+            "Cost": extract_auction(
+                pick.get("metadata") or {}
+            ),
+        })
+
+        if (
+            pick_number % 25 == 0
+            or pick_number == len(picks)
+        ):
+            log(
+                f"{year}: processed "
+                f"{pick_number:,} of "
+                f"{len(picks):,} picks"
+            )
+
+df_drafts = pd.DataFrame(draft_rows)
+
+if df_drafts.empty:
+    raise RuntimeError(
+        "No draft records were returned."
+    )
+
+df_drafts = (
+    df_drafts[
+        [
+            "Owner",
+            "Owner_ID",
+            "Year",
+            "Round",
+            "Team",
+            "Position",
+            "Player",
+            "Player_ID",
+            "Cost",
+        ]
+    ]
+    .sort_values(
+        ["Year", "Owner", "Round", "Cost"],
+        ascending=[False, True, True, False],
+    )
+    .reset_index(drop=True)
+)
+
+log(
+    f"Draft history completed: "
+    f"{len(df_drafts):,} records"
+)
+
+
+# ============================================================
+# STEP 5: DETERMINE KEEPER ELIGIBILITY
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 5: Determining keeper eligibility")
+log("=" * 70)
+
+
+def get_keeper_eligible(year, league_id):
+    """
+    A player must appear on the same roster during every week
+    from Week 11 through Week 17.
+    """
+
+    roster_history = defaultdict(
+        lambda: defaultdict(set)
+    )
+
+    for position, week in enumerate(
+        KEEPER_WEEKS,
+        start=1,
+    ):
+        matchups = get_json(
+            league_url(
+                league_id,
+                f"matchups/{week}",
+            ),
+            f"{year} Week {week} matchups",
+        )
+
+        for entry in matchups:
+            roster_id = entry.get("roster_id")
+
+            for player_id in entry.get("players") or []:
+                roster_history[roster_id][
+                    str(player_id)
+                ].add(week)
+
+        log(
+            f"{year}: completed keeper week "
+            f"{position} of {len(KEEPER_WEEKS)}"
+        )
+
+    required_weeks = set(KEEPER_WEEKS)
+    records = []
+
+    for roster_id, roster_players in roster_history.items():
+        owner_id = roster_owner_by_year[year].get(
+            roster_id
+        )
+
+        if owner_id is None:
+            continue
+
+        manager = users_by_year[year].get(
+            owner_id,
+            "Unknown",
+        )
+
+        for player_id, weeks_present in roster_players.items():
+            if required_weeks.issubset(weeks_present):
+                records.append({
+                    "Year": year,
+                    "Owner_ID": owner_id,
+                    "Manager": manager,
+                    "Roster_ID": roster_id,
+                    "Player_ID": player_id,
+                })
+
+    result = pd.DataFrame(
+        records,
+        columns=[
+            "Year",
+            "Owner_ID",
+            "Manager",
+            "Roster_ID",
+            "Player_ID",
+        ],
+    )
+
+    log(
+        f"{year}: found "
+        f"{len(result):,} keeper-eligible players"
+    )
+
+    return result
+
+
+eligible_by_year = {
+    year: get_keeper_eligible(
+        year,
+        league_id,
+    )
+    for year, league_id in LEAGUES.items()
 }
 
-function showKeepers(owner) {
-  const ownerKeepers = keepersData
-    .filter(row => row.Owner === owner)
-    .sort((a, b) =>
-      a.Position.localeCompare(b.Position) ||
-      a.Player.localeCompare(b.Player)
-    );
 
-  if (ownerKeepers.length === 0) {
-    keeperDisplay.innerHTML =
-      `<div class="no-keepers">${owner} has no eligible keepers.</div>`;
-    return;
-  }
+# ============================================================
+# STEP 6: DETERMINE KEEPER YEAR
+# ============================================================
 
-  let table = `
-    <table id="keeper-table" style="display:table;">
-      <caption>2026 Keepers</caption>
-      <tr>
-        <th>Player</th>
-        <th>Pos.</th>
-        <th>Keeper Year</th>
-        <th>Keeper Cost</th>
-      </tr>
-  `;
+log("\n" + "=" * 70)
+log("STEP 6: Determining keeper years")
+log("=" * 70)
 
-  ownerKeepers.forEach(row => {
-    table += `
-      <tr>
-        <td>${row.Player}${row.Team ? ` (${row.Team})` : ''}</td>
-        <td>${row.Position}</td>
-        <td>${row.KeeperYear}</td>
-        <td><b>${money(row.Cost)}</b></td>
-      </tr>
-    `;
-  });
+keepers_2026 = eligible_by_year[CURRENT_YEAR].copy()
 
-  table += '</table>';
-  keeperDisplay.innerHTML = table;
-}
+if keepers_2026.empty:
+    raise RuntimeError(
+        "No 2026-eligible players were found."
+    )
 
-renderOwners();
-</script>
-</body>
-</html>
+
+def was_eligible(year, owner_id, player_id):
+    prior = eligible_by_year.get(year)
+
+    if prior is None or prior.empty:
+        return False
+
+    return (
+        (prior["Owner_ID"] == owner_id)
+        & (prior["Player_ID"] == player_id)
+    ).any()
+
+
+def prior_keeper_years(owner_id, player_id):
+    """
+    Keeper use in 2026:
+
+    0 prior consecutive years = Keeper Year 1
+    1 prior consecutive year  = Keeper Year 2
+    2 prior consecutive years = Keeper Year 3
+    3 prior consecutive years = Keeper Year 4, not permitted
+    """
+
+    if not was_eligible(
+        2024,
+        owner_id,
+        player_id,
+    ):
+        return 0
+
+    if not was_eligible(
+        2023,
+        owner_id,
+        player_id,
+    ):
+        return 1
+
+    if not was_eligible(
+        2022,
+        owner_id,
+        player_id,
+    ):
+        return 2
+
+    return 3
+
+
+keepers_2026["Prior_Keeper_Years"] = (
+    keepers_2026.apply(
+        lambda row: prior_keeper_years(
+            row["Owner_ID"],
+            row["Player_ID"],
+        ),
+        axis=1,
+    )
+)
+
+# A fourth keeper use is not permitted.
+excluded_fourth_year = keepers_2026[
+    keepers_2026["Prior_Keeper_Years"] >= 3
+].copy()
+
+# Keeper Years 1, 2, and 3 remain eligible.
+keepers_2026 = keepers_2026[
+    keepers_2026["Prior_Keeper_Years"] < 3
+].copy()
+
+keepers_2026["Keeper_Year"] = (
+    keepers_2026["Prior_Keeper_Years"] + 1
+)
+
+log(
+    f"First-, second-, or third-year keepers: "
+    f"{len(keepers_2026):,}"
+)
+
+log(
+    f"Excluded fourth-year players: "
+    f"{len(excluded_fourth_year):,}"
+)
+
+
+# ============================================================
+# STEP 7: MAP 2025 AUCTION VALUES
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 7: Mapping 2025 auction values")
+log("=" * 70)
+
+auction_values = {}
+
+for pick in draft_picks_by_year[CURRENT_YEAR]:
+    player_id = str(
+        pick.get("player_id", "")
+    )
+
+    price = extract_auction(
+        pick.get("metadata") or {}
+    )
+
+    auction_values[player_id] = max(
+        price,
+        auction_values.get(player_id, 0),
+    )
+
+keepers_2026["Auction_Value"] = (
+    keepers_2026["Player_ID"]
+    .map(auction_values)
+    .fillna(0.0)
+)
+
+log(
+    f"Players with positive auction values: "
+    f"{(keepers_2026['Auction_Value'] > 0).sum():,}"
+)
+
+
+# ============================================================
+# STEP 8: CALCULATE 2025 WAIVER VALUES
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 8: Calculating 2025 waiver values")
+log("=" * 70)
+
+league_2025 = LEAGUES[CURRENT_YEAR]
+waiver_keeper_costs = {}
+
+for week in TRANSACTION_WEEKS:
+    transactions = get_json(
+        league_url(
+            league_2025,
+            f"transactions/{week}",
+        ),
+        f"2025 Week {week} transactions",
+    )
+
+    additions = 0
+
+    for transaction in transactions:
+        if transaction.get("type") not in (
+            "waiver",
+            "free_agent",
+        ):
+            continue
+
+        adds = transaction.get("adds") or {}
+
+        if not adds:
+            continue
+
+        settings = transaction.get("settings") or {}
+
+        waiver_bid = to_float(
+            settings.get("waiver_bid", 0),
+            0,
+        )
+
+        # League rule:
+        #
+        # Waiver base = max(waiver bid × 2, $10)
+        # Keeper cost = waiver base + $5
+        #
+        # $0 bid -> $10 base + $5 = $15
+        # $3 bid -> $10 base + $5 = $15
+        # $5 bid -> $10 base + $5 = $15
+        # $8 bid -> $16 base + $5 = $21
+
+        waiver_base = max(
+            waiver_bid * 2,
+            10,
+        )
+
+        transaction_keeper_cost = (
+            waiver_base + 5
+        )
+
+        for player_id in adds:
+            player_id = str(player_id)
+
+            # Preserve the highest waiver-derived value
+            # if the player was added multiple times.
+            waiver_keeper_costs[player_id] = max(
+                transaction_keeper_cost,
+                waiver_keeper_costs.get(
+                    player_id,
+                    0,
+                ),
+            )
+
+            additions += 1
+
+    log(
+        f"Week {week}: "
+        f"{additions:,} additions processed"
+    )
+
+
+# ============================================================
+# STEP 9: CALCULATE FINAL 2026 KEEPER COST
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 9: Calculating 2026 keeper costs")
+log("=" * 70)
+
+
+def calculate_keeper_cost(row):
+    """
+    Drafted player:
+        max(draft price, $5) + $5
+
+    Waiver/free-agent player:
+        max(waiver bid × 2, $10) + $5
+
+    If both values exist:
+        use the higher value.
+
+    Keeper Years 1, 2, and 3 use the same $5 keeper fee.
+    """
+
+    player_id = row["Player_ID"]
+
+    auction_value = to_float(
+        row["Auction_Value"],
+        0,
+    )
+
+    draft_keeper_cost = None
+
+    if auction_value > 0:
+        draft_base = max(
+            auction_value,
+            5,
+        )
+
+        draft_keeper_cost = (
+            draft_base + 5
+        )
+
+    waiver_keeper_cost = (
+        waiver_keeper_costs.get(player_id)
+    )
+
+    possible_costs = [
+        value
+        for value in (
+            draft_keeper_cost,
+            waiver_keeper_cost,
+        )
+        if value is not None
+    ]
+
+    # If no draft or waiver record is found:
+    # $10 minimum base plus $5 keeper fee.
+    final_cost = (
+        max(possible_costs)
+        if possible_costs
+        else 15
+    )
+
+    if (
+        draft_keeper_cost is not None
+        and waiver_keeper_cost is not None
+    ):
+        cost_source = (
+            "Draft"
+            if draft_keeper_cost >= waiver_keeper_cost
+            else "Waiver"
+        )
+
+    elif draft_keeper_cost is not None:
+        cost_source = "Draft"
+
+    elif waiver_keeper_cost is not None:
+        cost_source = "Waiver"
+
+    else:
+        cost_source = "Minimum"
+
+    return pd.Series({
+        "Draft_Keep_Cost": draft_keeper_cost,
+        "Waiver_Keep_Cost": waiver_keeper_cost,
+        "2026_Keep_Cost": final_cost,
+        "Cost_Source": cost_source,
+    })
+
+
+cost_details = keepers_2026.apply(
+    calculate_keeper_cost,
+    axis=1,
+)
+
+keepers_2026 = pd.concat(
+    [
+        keepers_2026.reset_index(drop=True),
+        cost_details.reset_index(drop=True),
+    ],
+    axis=1,
+)
+
+
+# ============================================================
+# STEP 10: ADD PLAYER DETAILS
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 10: Adding player details")
+log("=" * 70)
+
+keepers_2026["Player_Name"] = (
+    keepers_2026["Player_ID"]
+    .map(player_name)
+)
+
+keepers_2026["Team"] = (
+    keepers_2026["Player_ID"]
+    .map(player_team)
+)
+
+keepers_2026["Position"] = (
+    keepers_2026["Player_ID"]
+    .map(player_position)
+)
+
+keepers_2026["Games_Played"] = (
+    keepers_2026["Player_ID"]
+    .map(games_played)
+)
+
+keepers_2026 = (
+    keepers_2026[
+        [
+            "Manager",
+            "Player_Name",
+            "Team",
+            "Position",
+            "Player_ID",
+            "Keeper_Year",
+            "Auction_Value",
+            "Draft_Keep_Cost",
+            "Waiver_Keep_Cost",
+            "2026_Keep_Cost",
+            "Cost_Source",
+            "Games_Played",
+        ]
+    ]
+    .drop_duplicates(
+        subset=[
+            "Manager",
+            "Player_ID",
+        ]
+    )
+    .sort_values(
+        [
+            "Manager",
+            "Position",
+            "Player_Name",
+        ]
+    )
+    .reset_index(drop=True)
+)
+
+
+# ============================================================
+# STEP 11: FORMAT EXCLUDED FOURTH-YEAR PLAYERS
+# ============================================================
+
+if not excluded_fourth_year.empty:
+    excluded_fourth_year["Player_Name"] = (
+        excluded_fourth_year["Player_ID"]
+        .map(player_name)
+    )
+
+    excluded_fourth_year["Team"] = (
+        excluded_fourth_year["Player_ID"]
+        .map(player_team)
+    )
+
+    excluded_fourth_year["Position"] = (
+        excluded_fourth_year["Player_ID"]
+        .map(player_position)
+    )
+
+    excluded_fourth_year = (
+        excluded_fourth_year[
+            [
+                "Manager",
+                "Player_Name",
+                "Team",
+                "Position",
+                "Player_ID",
+                "Prior_Keeper_Years",
+            ]
+        ]
+        .sort_values(
+            [
+                "Manager",
+                "Player_Name",
+            ]
+        )
+        .reset_index(drop=True)
+    )
+
+
+# ============================================================
+# STEP 12: PREVIEW AND VALIDATION
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 12: Previewing results")
+log("=" * 70)
+
+log(
+    f"Eligible keeper records: "
+    f"{len(keepers_2026):,}"
+)
+
+log(
+    f"Managers represented: "
+    f"{keepers_2026['Manager'].nunique():,}"
+)
+
+log(
+    f"Players with draft values: "
+    f"{(keepers_2026['Auction_Value'] > 0).sum():,}"
+)
+
+log(
+    f"Players with waiver values: "
+    f"{keepers_2026['Waiver_Keep_Cost'].notna().sum():,}"
+)
+
+log("\n2026 keeper preview:")
+
+display(
+    keepers_2026.head(40)
+)
+
+log("\nEligible players per manager:")
+
+display(
+    keepers_2026
+    .groupby("Manager")
+    .size()
+    .reset_index(
+        name="Eligible_Players"
+    )
+)
+
+# Useful check for Caleb Williams.
+caleb_check = keepers_2026[
+    keepers_2026["Player_Name"]
+    .str.contains(
+        "Caleb Williams",
+        case=False,
+        na=False,
+    )
+]
+
+if not caleb_check.empty:
+    log("\nCaleb Williams check:")
+    display(caleb_check)
+
+
+# ============================================================
+# STEP 13: EXPORT TO EXCEL
+# ============================================================
+
+log("\n" + "=" * 70)
+log("STEP 13: Exporting Excel workbook")
+log("=" * 70)
+
+with pd.ExcelWriter(
+    OUTPUT_FILE,
+    engine="xlsxwriter",
+) as writer:
+
+    keepers_2026.to_excel(
+        writer,
+        sheet_name="2026 Eligible Keepers",
+        index=False,
+    )
+
+    df_drafts.to_excel(
+        writer,
+        sheet_name="Draft History",
+        index=False,
+    )
+
+    if not excluded_fourth_year.empty:
+        excluded_fourth_year.to_excel(
+            writer,
+            sheet_name="Excluded Fourth Year",
+            index=False,
+        )
+
+    workbook = writer.book
+
+    header_format = workbook.add_format({
+        "bold": True,
+        "border": 1,
+        "align": "center",
+    })
+
+    money_format = workbook.add_format({
+        "num_format": "$0.00",
+    })
+
+    integer_format = workbook.add_format({
+        "num_format": "0",
+    })
+
+    sheets = {
+        "2026 Eligible Keepers": keepers_2026,
+        "Draft History": df_drafts,
+    }
+
+    if not excluded_fourth_year.empty:
+        sheets["Excluded Fourth Year"] = (
+            excluded_fourth_year
+        )
+
+    for sheet_name, dataframe in sheets.items():
+        worksheet = writer.sheets[sheet_name]
+
+        for column_number, column_name in enumerate(
+            dataframe.columns
+        ):
+            worksheet.write(
+                0,
+                column_number,
+                column_name,
+                header_format,
+            )
+
+            worksheet.set_column(
+                column_number,
+                column_number,
+                safe_width(
+                    dataframe[column_name],
+                    column_name,
+                ),
+            )
+
+        worksheet.freeze_panes(1, 0)
+
+        if not dataframe.empty:
+            worksheet.autofilter(
+                0,
+                0,
+                len(dataframe),
+                len(dataframe.columns) - 1,
+            )
+
+    keeper_sheet = writer.sheets[
+        "2026 Eligible Keepers"
+    ]
+
+    # Keeper Year
+    keeper_sheet.set_column(
+        "F:F",
+        12,
+        integer_format,
+    )
+
+    # Auction and keeper cost columns
+    keeper_sheet.set_column(
+        "G:J",
+        18,
+        money_format,
+    )
+
+    # Draft History Cost column
+    writer.sheets["Draft History"].set_column(
+        "I:I",
+        12,
+        money_format,
+    )
+
+
+# ============================================================
+# COMPLETE
+# ============================================================
+
+log("\n" + "=" * 70)
+log("COMPLETE")
+log("=" * 70)
+
+log(
+    f"Saved workbook:\n"
+    f"{os.path.abspath(OUTPUT_FILE)}"
+)
+
+log(
+    f"Eligible 2026 keepers: "
+    f"{len(keepers_2026):,}"
+)
+
+log(
+    f"Excluded fourth-year players: "
+    f"{len(excluded_fourth_year):,}"
+)
+
+display(
+    FileLink(OUTPUT_FILE)
+)
