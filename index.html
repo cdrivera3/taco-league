@@ -133,12 +133,6 @@
     margin-top: 2px;
   }
 
-  .section li.no-bullet {
-    list-style: none;
-    margin-left: -1.35rem;
-    padding-left: 0;
-  }
-
   .topfriends {
     margin: 0 0 34px;
     padding: 22px;
@@ -152,6 +146,7 @@
   }
 
   .friend {
+    position: relative;
     width: 100%;
     padding: 14px 10px 12px;
     text-align: center;
@@ -159,6 +154,24 @@
     border: 1px solid transparent;
     border-radius: 14px;
     transition: transform 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+  }
+
+  .capital-badge {
+    position: absolute;
+    top: 4px;
+    right: 7px;
+    min-width: 42px;
+    padding: 5px 8px;
+    border: 2px solid var(--surface);
+    border-radius: 999px;
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.82rem;
+    font-weight: 900;
+    line-height: 1;
+    box-shadow: 0 4px 12px rgba(92, 52, 38, 0.28);
+    transform: rotate(5deg);
+    z-index: 2;
   }
 
   .friend:hover {
@@ -346,20 +359,32 @@
       <ul>
         <li>The 2/3 league vote will be used if anything must be decided. All members in the league must vote!</li>
         <li>The league will operate within the guidance of the Sleeper platform.</li>
-        <li class="no-bullet"><b>Keepers</b> Each team can choose 3 keeper players from their team's prior years roster.</li>
+      </ul>
+
+      <b>Keepers</b>
+      <ul>
+        <li>Each team can choose 3 keeper players from their team's prior year's roster.</li>
         <li>The first year's keeper fee is $5 plus draft capital, followed by a second year's fee of $5 plus draft capital. The minimum keeper base starts at $5 when calculating cost. A player may remain on the same team for a maximum of three total seasons: the original acquisition season plus two keeper seasons.</li>
         <li>Waiver pickups can be kept for double the waiver price plus the keeper fee. If a player is traded or dropped, the base for keeping them is at their highest value. Minimum waiver pickup keeper cost starts at $10.</li>
-        <li>Players drafted, dropped/traded, and picked up again in the same year will not reset the keeper year count.</li>
-        <li>Player must be on the team prior to the final game of week 11 and for the remainder of the season to be keeper eligible. Player must have played at least 1 game to be keeper eligible.</li>
-        <li class="no-bullet"><b>Pre-draft trading</b> Each team's three keepers must first be selected, locked, and paid for. After keepers lock, those players may be traded before the draft, along with any amount of auction draft capital agreed upon by the teams involved.</li>
-        <li class="no-bullet"><b>League Structure</b> Each team will have 15 roster spots: 1 QB, 2 RB, 2 WR, 1 RB/WR, 1 TE, 1 K, 1 DEF, 1 IR, 5 Bench spots.</li>
-        <li>Standings tie breakers goes to points for (to lessen the effect of having a tougher schedule than other teams).</li>
-        <li>Playoffs start week 15 with 6 teams and the championship week 17.</li>
+        <li>Players drafted, dropped or traded, and picked up again in the same year will not reset the keeper year count.</li>
+        <li>A player must be on the team prior to the final game of Week 11 and remain there for the rest of the season to be keeper eligible. The player must have played at least 1 game.</li>
+      </ul>
+
+      <b>Pre-Draft Trading</b>
+      <ul>
+        <li>Each team's three keepers must first be selected, locked, and paid for. After keepers lock, those players may be traded before the draft, along with any amount of auction draft capital agreed upon by the teams involved.</li>
+      </ul>
+
+      <b>League Structure</b>
+      <ul>
+        <li>Each team will have 15 roster spots: 1 QB, 2 RB, 2 WR, 1 RB/WR, 1 TE, 1 K, 1 DEF, 1 IR, and 5 bench spots.</li>
+        <li>Standings tiebreakers go to points for, reducing the effect of having a tougher schedule than other teams.</li>
+        <li>Playoffs start in Week 15 with 6 teams, and the championship is in Week 17.</li>
       </ul>
     </div>
     <div class="section-title">Payouts</div>
     <div class="section">
-      <b>Buy-in</b>
+      <b>Buy-In</b>
       <ul>
         <li>$150</li>
       </ul>
@@ -384,7 +409,7 @@
     <div class="section-title">Polls</div>
     <div class="section polls-section">
       <div class="polls-note">
-        As of July 25, 2026. Polls close when keepers are locked.
+        Last updated July 25, 2026. Polls close when keepers are locked.
       </div>
       <div class="poll-list">
         <div class="poll-row">
@@ -407,6 +432,12 @@ const keepersData = [{"Owner":"DannyTheGoat30","Player":"Caleb Williams","Team":
 
 const gallery = document.getElementById('owner-gallery');
 const keeperDisplay = document.getElementById('keeper-display');
+
+const extraDraftCapital = {
+  "mawki": 20,
+  "ItzNacha": 10,
+  "jdparsont": 5
+};
 
 function money(value) {
   const number = Number(value);
@@ -431,7 +462,10 @@ function renderOwners() {
   owners.forEach(owner => {
     const div = document.createElement('div');
     div.className = 'friend';
+    const bonus = extraDraftCapital[owner];
+
     div.innerHTML = `
+      ${bonus ? `<div class="capital-badge">+$${bonus}</div>` : ''}
       <img src="https://robohash.org/${encodeURIComponent(owner)}?set=set2&size=80x80"
            alt="${owner}">
       <span>${owner}</span>
@@ -469,7 +503,7 @@ function showKeepers(owner) {
         <th>Auction Value</th>
         <th>Draft Cost</th>
         <th>Waiver Cost</th>
-        <th>2026 Cost</th>
+        <th>Keeper Cost</th>
         <th>Source</th>
       </tr>
   `;
