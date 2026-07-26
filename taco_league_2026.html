@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Taco League 2026</title>
+  <style>
+    body {
+      background: #181818 url('https://cdn.pixabay.com/photo/2017/01/14/12/59/abstract-1979932_1280.jpg') repeat;
+      color: #fff;
+      font-family: 'Comic Sans MS', 'Arial', sans-serif;
+      margin: 0; padding: 0;
+    }
+    .mainbox {
+      background: #232323ee;
+      max-width: 940px;
+      margin: 38px auto;
+      border: 6px solid #0ff;
+      border-radius: 19px;
+      padding: 30px 34px 24px 34px;
+      box-shadow: 0 0 40px #00f8ff, 0 0 20px #fff4 inset;
+    }
+    h1 {
+      font-family: Impact, fantasy;
+      color: #0ff;
+      letter-spacing: 3px;
+      text-shadow: 4px 3px 10px #0ff, 1px 1px 0 #000;
+      font-size: 2.7em;
+      margin-top: 0;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    .musicbox {
+      margin: 0 auto 28px auto;
+      max-width: 360px;
+      background: #101a26e7;
+      border: 2.5px solid #ffd700;
+      border-radius: 12px;
+      text-align: center;
+      padding: 14px 0 5px 0;
+      box-shadow: 0 0 18px #00f9, 0 0 12px #ffd7005f;
+    }
+    .musicbox audio {
+      width: 90%;
+      margin: 0 auto;
+      display: block;
+      background: #ffd70011;
+    }
+    .music-note {
+      font-size: 1.15em;
+      color: #ffd700;
+      margin: 2px 0 0 0;
+      font-weight: bold;
+      text-shadow: 0 1px 7px #0ff6;
+    }
+    .section-title {
+      font-family: Impact, fantasy;
+      font-size: 2em;
+      color: #ffd700;
+      text-shadow: 2px 2px 0 #ad5405, 0 0 7px #000c;
+      letter-spacing: 1.5px;
+      margin-top: 32px;
+      margin-bottom: 8px;
+      border-bottom: 2px solid #ffd70077;
+      padding-bottom: 5px;
+      width: max-content;
+    }
+    .section {
+      margin-top: 8px;
+      margin-bottom: 24px;
+      font-size: 1.13em;
+      background: #fff2;
+      padding: 16px 26px 18px 26px;
+      border-radius: 12px;
+      box-shadow: 0 0 8px #fff3;
+      color: #ffecc6;
+      line-height: 1.8em;
+    }
+    ul, li {
+      font-size: 1.08em;
+      color: #fffde8;
+      margin-bottom: 13px;
+      margin-top: 2px;
+      line-height: 1.7em;
+    }
+    .marquee {
+      margin: 21px 0 13px 0;
+      font-size: 1.11em;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #001e2d;
+      color: #ffd700;
+      border-radius: 7px;
+      padding: 7px 10px;
+      box-shadow: 0 0 10px #0ff6;
+      font-weight: bold;
+      text-align: center;
+    }
+    .topfriends {
+      background: #0ff1;
+      border-radius: 12px;
+      margin: 26px 0 18px 0;
+      padding: 17px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 27px;
+      justify-content: center;
+      box-shadow: 0 0 18px #0ff4;
+    }
+    .friend {
+      text-align: center;
+      width: 92px;
+      cursor: pointer;
+    }
+    .friend img {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      border: 3px solid #0ff;
+      background: #fff;
+      margin-bottom: 7px;
+      transition: transform 0.22s;
+      box-shadow: 0 0 9px #fff7, 0 0 9px #0ff;
+    }
+    .friend img:hover {
+      transform: scale(1.17) rotate(-6deg);
+      border: 3px solid #ffd700;
+    }
+    .friend span {
+      font-size: 1.09em;
+      color: #fff;
+      background: #111b;
+      padding: 2px 7px;
+      border-radius: 6px;
+      letter-spacing: 1px;
+    }
+    #keeper-table {
+      margin-top: 30px;
+      width: 98%;
+      background: #1a2837;
+      border-radius: 11px;
+      box-shadow: 0 0 10px #0090ff3f;
+      display: none;
+    }
+    #keeper-table th, #keeper-table td {
+      padding: 12px 11px;
+      font-size: 1.07em;
+      border-bottom: 1px solid #22395b;
+    }
+    #keeper-table th {
+      background: #0ff6;
+      color: #181818;
+    }
+    #keeper-table td {
+      color: #ffd700;
+    }
+    #keeper-table tr:last-child td {
+      border-bottom: none;
+    }
+    #keeper-table caption {
+      color: #fff;
+      font-size: 1.28em;
+      margin-bottom: 14px;
+      font-weight: bold;
+    }
+    .no-keepers {
+      color: #ffd700;
+      font-size: 1.11em;
+      margin: 30px auto 0 auto;
+      text-align: center;
+    }
+    /* Overlay modal styles */
+    #overlay {
+      position: fixed;
+      z-index: 9999;
+      left: 0; top: 0; width: 100vw; height: 100vh;
+      background: rgba(20,20,22,0.97);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+    #overlay h2 {
+      font-size: 2.1em;
+      color: #ffd700;
+      margin-bottom: 18px;
+      text-shadow: 2px 2px 14px #0ff, 0 0 7px #000c;
+      font-family: Impact, fantasy;
+    }
+    #overlay .playbtn {
+      background: #0ff;
+      color: #191818;
+      border: none;
+      font-size: 1.35em;
+      font-family: Impact, Arial, sans-serif;
+      padding: 15px 32px;
+      border-radius: 14px;
+      box-shadow: 0 0 10px #ffd7008f, 0 0 10px #0ff;
+      margin: 22px 0 0 0;
+      font-weight: bold;
+      transition: background 0.2s, color 0.2s;
+      cursor: pointer;
+    }
+    #overlay .playbtn:hover {
+      background: #ffd700;
+      color: #001e2d;
+    }
+    @media (max-width: 650px) {
+      .mainbox { padding: 8px; }
+      .section, .musicbox { padding: 7px 4vw; }
+      h1 { font-size: 2em; }
+      .section-title { font-size: 1.23em; }
+      #keeper-table { font-size: 0.97em; }
+    }
+  </style>
+</head>
+<body>
+  <!-- Overlay for music play -->
+  <div id="overlay">
+    <h2>Welcome to Taco League!</h2>
+    <p style="font-size:1.17em;color:#fff;margin-bottom:18px;">
+      <br>
+      <b>Click PLAY below to enter:</b>
+    </p>
+    <button class="playbtn" onclick="startSite()">▶ Play Here Comes the Boom</button>
+    <audio id="audioPre" src="here_comes_the_boom.mp3"></audio>
+  </div>
+  <div class="mainbox" style="display:none;" id="mainContent">
+    <h1>🌮 Taco League 2026 🌮</h1>
+    <div class="musicbox">
+      <audio id="audioPlayer" controls loop>
+        <source src="here_comes_the_boom.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+      </audio>
+      <div class="music-note">
+        
+      </div>
+    </div>
+    <div class="marquee" style="font-size:2em; padding:20px 10px; text-align:center;">
+      Upload the 2026 keeper workbook below to view each owner's eligible players.
+    </div>
+    <div class="section-title">Constitution</div>
+    <div class="section">
+      <ul>
+        <li>The 2/3 league vote will be used if anything must be decided. All members in the league must vote!</li>
+        <li>The league will operate within the guidance of the Sleeper platform.</li>
+        <li><b>Keepers:</b> Each team can choose 3 keeper players from their team's prior years roster.</li>
+        <li>The first year's keeper fee is $5+ draft capital, followed by a second year's fee of $5+ draft capital. Minimum keeper base starts at $5 when calculating cost.</li>
+        <li>Waiver pickups can be kept for double the waiver price plus the keeper fee. If a player is traded or dropped, the base for keeping them is at their highest value. Minimum waiver pickup keeper cost starts at $10.</li>
+        <li>Players drafted, dropped/traded, and picked up again in the same year will not reset the keeper year count.</li>
+        <li>Player must be on the team prior to the final game of week 11 and for the remainder of the season to be keeper eligible. Player must have played at least 1 game to be keeper eligible.</li>
+        <li>Keepers must be identified a week before the next draft.</li>
+        <li><b>League Structure:</b> Each team will have 15 roster spots: 1 QB, 2 RB, 2 WR, 1 RB/WR, 1 TE, 1 K, 1 DEF, 1 IR, 5 Bench spots.</li>
+        <li>Standings tie breakers goes to points for (to lessen the effect of having a tougher schedule than other teams).</li>
+        <li>Playoffs start week 15 with 6 teams and the championship week 17.</li>
+      </ul>
+    </div>
+    <div class="section-title">Payouts</div>
+    <div class="section">
+      <ul>
+        <li><b>Buy-in:</b> $150 </li>
+
+      </ul>
+      <b>Payouts:</b>
+      <ul>
+        <li>1st Place: $1,200</li>
+        <li>2nd Place: $400</li>
+        <li>3rd Place: $150</li>
+        <li>4th Place: $50</li>
+      </ul>
+      <b>Toilet Bowl:</b>
+      <ul>
+        <li>1st: $20 draft capital</li>
+        <li>2nd: $10 draft capital</li>
+        <li>3rd: $5 draft capital</li>
+      </ul>
+    </div>
+    <div class="section-title">2026 Keeper Workbook</div>
+    <div class="section">
+      <p style="margin-top:0">
+        Select the Excel workbook created by the Jupyter script.
+        The page reads the <b>2026 Eligible Keepers</b> sheet automatically.
+      </p>
+      <input id="workbook-file" type="file" accept=".xlsx,.xls" style="
+        font-size:1em;
+        padding:10px;
+        border-radius:8px;
+        background:#fff;
+        color:#111;
+        max-width:100%;
+      ">
+      <div id="load-status" style="margin-top:12px;color:#ffd700;font-weight:bold;">
+        No workbook loaded.
+      </div>
+    </div>
+
+    <div class="section-title">🔥 Owners 🔥</div>
+    <div class="topfriends" id="owner-gallery"></div>
+    <div id="keeper-display"></div>
+  </div>
+<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
+<script>
+function startSite() {
+  document.getElementById('overlay').style.display = 'none';
+  document.getElementById('mainContent').style.display = 'block';
+
+  const audio = document.getElementById('audioPlayer');
+  audio.play().catch(() => {});
+}
+
+let keepersData = [];
+
+const gallery = document.getElementById('owner-gallery');
+const keeperDisplay = document.getElementById('keeper-display');
+const fileInput = document.getElementById('workbook-file');
+const loadStatus = document.getElementById('load-status');
+
+function money(value) {
+  const number = Number(value);
+  return Number.isFinite(number)
+    ? number.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+      })
+    : '';
+}
+
+function normalizeRow(row) {
+  return {
+    Owner: String(row.Manager ?? row.Owner ?? '').trim(),
+    Player: String(row.Player_Name ?? row.Player ?? '').trim(),
+    Team: String(row.Team ?? '').trim(),
+    Position: String(row.Position ?? '').trim(),
+    PlayerID: String(row.Player_ID ?? '').trim(),
+    KeeperYear: Number(row.Keeper_Year ?? row.KeeperYear ?? 0),
+    AuctionValue: Number(row.Auction_Value ?? 0),
+    DraftKeepCost:
+      row.Draft_Keep_Cost === '' || row.Draft_Keep_Cost == null
+        ? null
+        : Number(row.Draft_Keep_Cost),
+    WaiverKeepCost:
+      row.Waiver_Keep_Cost === '' || row.Waiver_Keep_Cost == null
+        ? null
+        : Number(row.Waiver_Keep_Cost),
+    Cost: Number(row['2026_Keep_Cost'] ?? row.Cost ?? 0),
+    CostSource: String(row.Cost_Source ?? '').trim()
+  };
+}
+
+function renderOwners() {
+  gallery.innerHTML = '';
+  keeperDisplay.innerHTML = '';
+
+  const owners = [...new Set(
+    keepersData.map(row => row.Owner).filter(Boolean)
+  )].sort((a, b) => a.localeCompare(b));
+
+  owners.forEach(owner => {
+    const div = document.createElement('div');
+    div.className = 'friend';
+    div.innerHTML = `
+      <img src="https://robohash.org/${encodeURIComponent(owner)}?set=set2&size=80x80"
+           alt="${owner}">
+      <span>${owner}</span>
+    `;
+    div.onclick = () => showKeepers(owner);
+    gallery.appendChild(div);
+  });
+
+  if (owners.length > 0) {
+    showKeepers(owners[0]);
+  }
+}
+
+function showKeepers(owner) {
+  const ownerKeepers = keepersData
+    .filter(row => row.Owner === owner)
+    .sort((a, b) =>
+      a.Position.localeCompare(b.Position) ||
+      a.Player.localeCompare(b.Player)
+    );
+
+  if (ownerKeepers.length === 0) {
+    keeperDisplay.innerHTML =
+      `<div class="no-keepers">${owner} has no eligible keepers.</div>`;
+    return;
+  }
+
+  let table = `
+    <table id="keeper-table" style="display:table;">
+      <caption>${owner}'s 2026 Keeper-Eligible Players</caption>
+      <tr>
+        <th>Player</th>
+        <th>Pos.</th>
+        <th>Keeper Year</th>
+        <th>Auction Value</th>
+        <th>Draft Cost</th>
+        <th>Waiver Cost</th>
+        <th>2026 Cost</th>
+        <th>Source</th>
+      </tr>
+  `;
+
+  ownerKeepers.forEach(row => {
+    table += `
+      <tr>
+        <td>${row.Player}${row.Team ? ` (${row.Team})` : ''}</td>
+        <td>${row.Position}</td>
+        <td>${row.KeeperYear}</td>
+        <td>${money(row.AuctionValue)}</td>
+        <td>${row.DraftKeepCost == null ? '' : money(row.DraftKeepCost)}</td>
+        <td>${row.WaiverKeepCost == null ? '' : money(row.WaiverKeepCost)}</td>
+        <td><b>${money(row.Cost)}</b></td>
+        <td>${row.CostSource}</td>
+      </tr>
+    `;
+  });
+
+  table += '</table>';
+  keeperDisplay.innerHTML = table;
+}
+
+fileInput.addEventListener('change', event => {
+  const file = event.target.files[0];
+
+  if (!file) {
+    loadStatus.textContent = 'No workbook loaded.';
+    return;
+  }
+
+  loadStatus.textContent = `Loading ${file.name}...`;
+
+  const reader = new FileReader();
+
+  reader.onload = e => {
+    try {
+      const workbook = XLSX.read(e.target.result, { type: 'array' });
+
+      const preferredSheet = '2026 Eligible Keepers';
+      const sheetName = workbook.SheetNames.includes(preferredSheet)
+        ? preferredSheet
+        : workbook.SheetNames[0];
+
+      const worksheet = workbook.Sheets[sheetName];
+      const rows = XLSX.utils.sheet_to_json(worksheet, {
+        defval: '',
+        raw: true
+      });
+
+      keepersData = rows
+        .map(normalizeRow)
+        .filter(row => row.Owner && row.Player);
+
+      if (keepersData.length === 0) {
+        throw new Error(
+          `No keeper rows were found in the "${sheetName}" sheet.`
+        );
+      }
+
+      renderOwners();
+
+      loadStatus.textContent =
+        `Loaded ${keepersData.length} eligible players from ` +
+        `"${sheetName}" in ${file.name}.`;
+    } catch (error) {
+      console.error(error);
+      keepersData = [];
+      gallery.innerHTML = '';
+      keeperDisplay.innerHTML = '';
+      loadStatus.textContent = `Could not load workbook: ${error.message}`;
+    }
+  };
+
+  reader.onerror = () => {
+    loadStatus.textContent = 'Could not read the selected workbook.';
+  };
+
+  reader.readAsArrayBuffer(file);
+});
+</script>
+</body>
+</html>
