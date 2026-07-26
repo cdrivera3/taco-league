@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Taco League 2026</title>
+  <title>Taco League</title>
   <style>
     body {
       background: #181818 url('https://cdn.pixabay.com/photo/2017/01/14/12/59/abstract-1979932_1280.jpg') repeat;
@@ -167,43 +167,7 @@
       margin: 30px auto 0 auto;
       text-align: center;
     }
-    /* Overlay modal styles */
-    #overlay {
-      position: fixed;
-      z-index: 9999;
-      left: 0; top: 0; width: 100vw; height: 100vh;
-      background: rgba(20,20,22,0.97);
-      color: #fff;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-    }
-    #overlay h2 {
-      font-size: 2.1em;
-      color: #ffd700;
-      margin-bottom: 18px;
-      text-shadow: 2px 2px 14px #0ff, 0 0 7px #000c;
-      font-family: Impact, fantasy;
-    }
-    #overlay .playbtn {
-      background: #0ff;
-      color: #191818;
-      border: none;
-      font-size: 1.35em;
-      font-family: Impact, Arial, sans-serif;
-      padding: 15px 32px;
-      border-radius: 14px;
-      box-shadow: 0 0 10px #ffd7008f, 0 0 10px #0ff;
-      margin: 22px 0 0 0;
-      font-weight: bold;
-      transition: background 0.2s, color 0.2s;
-      cursor: pointer;
-    }
-    #overlay .playbtn:hover {
-      background: #ffd700;
-      color: #001e2d;
-    }
+
     @media (max-width: 650px) {
       .mainbox { padding: 8px; }
       .section, .musicbox { padding: 7px 4vw; }
@@ -214,29 +178,10 @@
   </style>
 </head>
 <body>
-  <!-- Overlay for music play -->
-  <div id="overlay">
-    <h2>Welcome to Taco League!</h2>
-    <p style="font-size:1.17em;color:#fff;margin-bottom:18px;">
-      <br>
-      <b>Click PLAY below to enter:</b>
-    </p>
-    <button class="playbtn" onclick="startSite()">▶ Play Here Comes the Boom</button>
-    <audio id="audioPre" src="here_comes_the_boom.mp3"></audio>
-  </div>
-  <div class="mainbox" style="display:none;" id="mainContent">
-    <h1>🌮 Taco League 2026 🌮</h1>
-    <div class="musicbox">
-      <audio id="audioPlayer" controls loop>
-        <source src="here_comes_the_boom.mp3" type="audio/mpeg">
-        Your browser does not support the audio element.
-      </audio>
-      <div class="music-note">
-        
-      </div>
-    </div>
+  <div class="mainbox" id="mainContent">
+    <h1>🌮 Taco League 🌮</h1>
     <div class="marquee" style="font-size:2em; padding:20px 10px; text-align:center;">
-      Upload the 2026 keeper workbook below to view each owner's eligible players.
+      Draft is August 23, 2026. Keepers and buy-in are due August 9, 2026.
     </div>
     <div class="section-title">Constitution</div>
     <div class="section">
@@ -274,45 +219,15 @@
         <li>3rd: $5 draft capital</li>
       </ul>
     </div>
-    <div class="section-title">2026 Keeper Workbook</div>
-    <div class="section">
-      <p style="margin-top:0">
-        Select the Excel workbook created by the Jupyter script.
-        The page reads the <b>2026 Eligible Keepers</b> sheet automatically.
-      </p>
-      <input id="workbook-file" type="file" accept=".xlsx,.xls" style="
-        font-size:1em;
-        padding:10px;
-        border-radius:8px;
-        background:#fff;
-        color:#111;
-        max-width:100%;
-      ">
-      <div id="load-status" style="margin-top:12px;color:#ffd700;font-weight:bold;">
-        No workbook loaded.
-      </div>
-    </div>
-
     <div class="section-title">🔥 Owners 🔥</div>
     <div class="topfriends" id="owner-gallery"></div>
     <div id="keeper-display"></div>
   </div>
-<script src="https://cdn.jsdelivr.net/npm/xlsx/dist/xlsx.full.min.js"></script>
 <script>
-function startSite() {
-  document.getElementById('overlay').style.display = 'none';
-  document.getElementById('mainContent').style.display = 'block';
-
-  const audio = document.getElementById('audioPlayer');
-  audio.play().catch(() => {});
-}
-
-let keepersData = [];
+const keepersData = [{"Owner":"DannyTheGoat30","Player":"Caleb Williams","Team":"CHI","Position":"QB","PlayerID":"11560","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Patrick Mahomes","Team":"KC","Position":"QB","PlayerID":"4046","KeeperYear":1,"AuctionValue":14.0,"DraftKeepCost":19.0,"WaiverKeepCost":null,"Cost":19.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Ashton Jeanty","Team":"LV","Position":"RB","PlayerID":"12527","KeeperYear":1,"AuctionValue":66.0,"DraftKeepCost":71.0,"WaiverKeepCost":null,"Cost":71.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"RJ Harvey","Team":"DEN","Position":"RB","PlayerID":"12489","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":null,"Cost":35.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Harold Fannin","Team":"CLE","Position":"TE","PlayerID":"12506","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":49.0,"Cost":49.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Jake Ferguson","Team":"DAL","Position":"TE","PlayerID":"8110","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"DannyTheGoat30","Player":"Brian Thomas","Team":"JAX","Position":"WR","PlayerID":"11631","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Chris Olave","Team":"NO","Position":"WR","PlayerID":"8144","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"DeVonta Smith","Team":"PHI","Position":"WR","PlayerID":"7525","KeeperYear":1,"AuctionValue":19.0,"DraftKeepCost":24.0,"WaiverKeepCost":null,"Cost":24.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Jordan Addison","Team":"MIN","Position":"WR","PlayerID":"9756","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":null,"Cost":11.0,"CostSource":"Draft"},{"Owner":"DannyTheGoat30","Player":"Stefon Diggs","Team":"","Position":"WR","PlayerID":"2449","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Seattle Seahawks","Team":"SEA","Position":"DEF","PlayerID":"SEA","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":17.0,"Cost":17.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Drake Maye","Team":"NE","Position":"QB","PlayerID":"11564","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Lamar Jackson","Team":"BAL","Position":"QB","PlayerID":"4881","KeeperYear":2,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Devin Singletary","Team":"NYG","Position":"RB","PlayerID":"6130","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"James Conner","Team":"ARI","Position":"RB","PlayerID":"4137","KeeperYear":1,"AuctionValue":26.0,"DraftKeepCost":31.0,"WaiverKeepCost":null,"Cost":31.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Kareem Hunt","Team":"","Position":"RB","PlayerID":"4098","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Dirtymac2","Player":"Saquon Barkley","Team":"PHI","Position":"RB","PlayerID":"4866","KeeperYear":1,"AuctionValue":69.0,"DraftKeepCost":74.0,"WaiverKeepCost":null,"Cost":74.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Tyrone Tracy","Team":"NYG","Position":"RB","PlayerID":"11655","KeeperYear":1,"AuctionValue":13.0,"DraftKeepCost":18.0,"WaiverKeepCost":null,"Cost":18.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Dallas Goedert","Team":"PHI","Position":"TE","PlayerID":"5022","KeeperYear":1,"AuctionValue":3.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"CeeDee Lamb","Team":"DAL","Position":"WR","PlayerID":"6786","KeeperYear":1,"AuctionValue":45.0,"DraftKeepCost":50.0,"WaiverKeepCost":null,"Cost":50.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Khalil Shakir","Team":"BUF","Position":"WR","PlayerID":"8134","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Dirtymac2","Player":"Puka Nacua","Team":"LAR","Position":"WR","PlayerID":"9493","KeeperYear":2,"AuctionValue":46.0,"DraftKeepCost":51.0,"WaiverKeepCost":null,"Cost":51.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"David Montgomery","Team":"HOU","Position":"RB","PlayerID":"5892","KeeperYear":2,"AuctionValue":21.0,"DraftKeepCost":26.0,"WaiverKeepCost":null,"Cost":26.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Jaylen Warren","Team":"PIT","Position":"RB","PlayerID":"8228","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Quinshon Judkins","Team":"CLE","Position":"RB","PlayerID":"12512","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"TreVeyon Henderson","Team":"NE","Position":"RB","PlayerID":"12529","KeeperYear":1,"AuctionValue":43.0,"DraftKeepCost":48.0,"WaiverKeepCost":null,"Cost":48.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Brock Bowers","Team":"LV","Position":"TE","PlayerID":"11604","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Marvin Harrison","Team":"ARI","Position":"WR","PlayerID":"11628","KeeperYear":1,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Rashee Rice","Team":"KC","Position":"WR","PlayerID":"10229","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"ItzNacha","Player":"Tee Higgins","Team":"CIN","Position":"WR","PlayerID":"6801","KeeperYear":1,"AuctionValue":23.0,"DraftKeepCost":28.0,"WaiverKeepCost":null,"Cost":28.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Denver Broncos","Team":"DEN","Position":"DEF","PlayerID":"DEN","KeeperYear":1,"AuctionValue":12.0,"DraftKeepCost":17.0,"WaiverKeepCost":21.0,"Cost":21.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Bo Nix","Team":"DEN","Position":"QB","PlayerID":"11563","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":25.0,"Cost":25.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Josh Allen","Team":"BUF","Position":"QB","PlayerID":"4984","KeeperYear":1,"AuctionValue":35.0,"DraftKeepCost":40.0,"WaiverKeepCost":null,"Cost":40.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Chase Brown","Team":"CIN","Position":"RB","PlayerID":"9224","KeeperYear":1,"AuctionValue":50.0,"DraftKeepCost":55.0,"WaiverKeepCost":null,"Cost":55.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Derrick Henry","Team":"BAL","Position":"RB","PlayerID":"3198","KeeperYear":1,"AuctionValue":60.0,"DraftKeepCost":65.0,"WaiverKeepCost":null,"Cost":65.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Kenneth Walker","Team":"KC","Position":"RB","PlayerID":"8151","KeeperYear":1,"AuctionValue":32.0,"DraftKeepCost":37.0,"WaiverKeepCost":null,"Cost":37.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Hunter Henry","Team":"NE","Position":"TE","PlayerID":"3214","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Juan2Three","Player":"Tucker Kraft","Team":"GB","Position":"TE","PlayerID":"9484","KeeperYear":1,"AuctionValue":4.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Jaxon Smith-Njigba","Team":"SEA","Position":"WR","PlayerID":"9488","KeeperYear":1,"AuctionValue":31.0,"DraftKeepCost":36.0,"WaiverKeepCost":null,"Cost":36.0,"CostSource":"Draft"},{"Owner":"Juan2Three","Player":"Ladd McConkey","Team":"LAC","Position":"WR","PlayerID":"11635","KeeperYear":2,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Brock Purdy","Team":"SF","Position":"QB","PlayerID":"8183","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Christian McCaffrey","Team":"SF","Position":"RB","PlayerID":"4034","KeeperYear":1,"AuctionValue":75.0,"DraftKeepCost":80.0,"WaiverKeepCost":null,"Cost":80.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Christian Watson","Team":"GB","Position":"WR","PlayerID":"8167","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Jauan Jennings","Team":"MIN","Position":"WR","PlayerID":"7049","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":41.0,"Cost":41.0,"CostSource":"Waiver"},{"Owner":"Monsy","Player":"Travis Hunter","Team":"JAX","Position":"WR","PlayerID":"12530","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":15.0,"Cost":20.0,"CostSource":"Draft"},{"Owner":"Monsy","Player":"Wan'Dale Robinson","Team":"TEN","Position":"WR","PlayerID":"8126","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":79.0,"Cost":79.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Jaxson Dart","Team":"NYG","Position":"QB","PlayerID":"12508","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Breece Hall","Team":"NYJ","Position":"RB","PlayerID":"8155","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"D'Andre Swift","Team":"CHI","Position":"RB","PlayerID":"6790","KeeperYear":1,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"De'Von Achane","Team":"MIA","Position":"RB","PlayerID":"9226","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Isaiah Davis","Team":"NYJ","Position":"RB","PlayerID":"11571","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"cdrivera3","Player":"Tyler Allgeier","Team":"ARI","Position":"RB","PlayerID":"8132","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"A.J. Brown","Team":"NE","Position":"WR","PlayerID":"5859","KeeperYear":1,"AuctionValue":36.0,"DraftKeepCost":41.0,"WaiverKeepCost":null,"Cost":41.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Amon-Ra St. Brown","Team":"DET","Position":"WR","PlayerID":"7547","KeeperYear":1,"AuctionValue":24.0,"DraftKeepCost":29.0,"WaiverKeepCost":null,"Cost":29.0,"CostSource":"Draft"},{"Owner":"cdrivera3","Player":"Zay Flowers","Team":"BAL","Position":"WR","PlayerID":"9997","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Dak Prescott","Team":"DAL","Position":"QB","PlayerID":"3294","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":61.0,"Cost":61.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Aaron Jones","Team":"MIN","Position":"RB","PlayerID":"4199","KeeperYear":2,"AuctionValue":23.0,"DraftKeepCost":28.0,"WaiverKeepCost":null,"Cost":28.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Kyle Monangai","Team":"CHI","Position":"RB","PlayerID":"12534","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":37.0,"Cost":37.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Kyren Williams","Team":"LAR","Position":"RB","PlayerID":"8150","KeeperYear":1,"AuctionValue":50.0,"DraftKeepCost":55.0,"WaiverKeepCost":null,"Cost":55.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Tyler Warren","Team":"IND","Position":"TE","PlayerID":"12518","KeeperYear":1,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Chris Godwin","Team":"TB","Position":"WR","PlayerID":"4037","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Jayden Reed","Team":"GB","Position":"WR","PlayerID":"10222","KeeperYear":1,"AuctionValue":3.0,"DraftKeepCost":10.0,"WaiverKeepCost":19.0,"Cost":19.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Jaylen Waddle","Team":"DEN","Position":"WR","PlayerID":"7526","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Luther Burden","Team":"CHI","Position":"WR","PlayerID":"12519","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"erikglinde13","Player":"Michael Pittman","Team":"PIT","Position":"WR","PlayerID":"6819","KeeperYear":1,"AuctionValue":11.0,"DraftKeepCost":16.0,"WaiverKeepCost":null,"Cost":16.0,"CostSource":"Draft"},{"Owner":"erikglinde13","Player":"Michael Wilson","Team":"ARI","Position":"WR","PlayerID":"10232","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Matthew Stafford","Team":"LAR","Position":"QB","PlayerID":"421","KeeperYear":2,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":35.0,"Cost":35.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Chuba Hubbard","Team":"CAR","Position":"RB","PlayerID":"7594","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Kimani Vidal","Team":"LAC","Position":"RB","PlayerID":"11647","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":35.0,"Cost":35.0,"CostSource":"Waiver"},{"Owner":"faperez23","Player":"Rico Dowdle","Team":"PIT","Position":"RB","PlayerID":"7021","KeeperYear":2,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Tony Pollard","Team":"TEN","Position":"RB","PlayerID":"5967","KeeperYear":1,"AuctionValue":13.0,"DraftKeepCost":18.0,"WaiverKeepCost":null,"Cost":18.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Zach Charbonnet","Team":"SEA","Position":"RB","PlayerID":"9753","KeeperYear":1,"AuctionValue":7.0,"DraftKeepCost":12.0,"WaiverKeepCost":null,"Cost":12.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Travis Kelce","Team":"KC","Position":"TE","PlayerID":"1466","KeeperYear":1,"AuctionValue":9.0,"DraftKeepCost":14.0,"WaiverKeepCost":null,"Cost":14.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Emeka Egbuka","Team":"TB","Position":"WR","PlayerID":"12514","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"faperez23","Player":"Rome Odunze","Team":"CHI","Position":"WR","PlayerID":"11620","KeeperYear":1,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Houston Texans","Team":"HOU","Position":"DEF","PlayerID":"HOU","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Jayden Daniels","Team":"WAS","Position":"QB","PlayerID":"11566","KeeperYear":2,"AuctionValue":10.0,"DraftKeepCost":15.0,"WaiverKeepCost":null,"Cost":15.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Javonte Williams","Team":"DAL","Position":"RB","PlayerID":"7588","KeeperYear":1,"AuctionValue":7.0,"DraftKeepCost":12.0,"WaiverKeepCost":null,"Cost":12.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Omarion Hampton","Team":"LAC","Position":"RB","PlayerID":"12507","KeeperYear":1,"AuctionValue":46.0,"DraftKeepCost":51.0,"WaiverKeepCost":null,"Cost":51.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Travis Etienne","Team":"NO","Position":"RB","PlayerID":"7543","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Woody Marks","Team":"HOU","Position":"RB","PlayerID":"12474","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":39.0,"Cost":39.0,"CostSource":"Waiver"},{"Owner":"jdparsont","Player":"Alec Pierce","Team":"IND","Position":"WR","PlayerID":"8142","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":45.0,"Cost":45.0,"CostSource":"Waiver"},{"Owner":"jdparsont","Player":"DJ Moore","Team":"BUF","Position":"WR","PlayerID":"4983","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":15.0,"Cost":20.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Deebo Samuel","Team":"","Position":"WR","PlayerID":"5872","KeeperYear":1,"AuctionValue":8.0,"DraftKeepCost":13.0,"WaiverKeepCost":null,"Cost":13.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Drake London","Team":"ATL","Position":"WR","PlayerID":"8112","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Jameson Williams","Team":"DET","Position":"WR","PlayerID":"8148","KeeperYear":1,"AuctionValue":16.0,"DraftKeepCost":21.0,"WaiverKeepCost":null,"Cost":21.0,"CostSource":"Draft"},{"Owner":"jdparsont","Player":"Terry McLaurin","Team":"WAS","Position":"WR","PlayerID":"5927","KeeperYear":2,"AuctionValue":22.0,"DraftKeepCost":27.0,"WaiverKeepCost":null,"Cost":27.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Bucky Irving","Team":"TB","Position":"RB","PlayerID":"11584","KeeperYear":2,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":null,"Cost":20.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Josh Jacobs","Team":"GB","Position":"RB","PlayerID":"5850","KeeperYear":1,"AuctionValue":52.0,"DraftKeepCost":57.0,"WaiverKeepCost":null,"Cost":57.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"George Kittle","Team":"SF","Position":"TE","PlayerID":"4217","KeeperYear":1,"AuctionValue":28.0,"DraftKeepCost":33.0,"WaiverKeepCost":null,"Cost":33.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Oronde Gadsden","Team":"LAC","Position":"TE","PlayerID":"12493","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"matt4508","Player":"Davante Adams","Team":"LAR","Position":"WR","PlayerID":"2133","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Ja'Marr Chase","Team":"CIN","Position":"WR","PlayerID":"7564","KeeperYear":1,"AuctionValue":29.0,"DraftKeepCost":34.0,"WaiverKeepCost":null,"Cost":34.0,"CostSource":"Draft"},{"Owner":"matt4508","Player":"Jakobi Meyers","Team":"JAX","Position":"WR","PlayerID":"5947","KeeperYear":1,"AuctionValue":6.0,"DraftKeepCost":11.0,"WaiverKeepCost":null,"Cost":11.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Cleveland Browns","Team":"CLE","Position":"DEF","PlayerID":"CLE","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Baker Mayfield","Team":"TB","Position":"QB","PlayerID":"4892","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":49.0,"Cost":49.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Joe Burrow","Team":"CIN","Position":"QB","PlayerID":"6770","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":15.0,"Cost":35.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Bijan Robinson","Team":"ATL","Position":"RB","PlayerID":"9509","KeeperYear":1,"AuctionValue":83.0,"DraftKeepCost":88.0,"WaiverKeepCost":null,"Cost":88.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Blake Corum","Team":"LAR","Position":"RB","PlayerID":"11586","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"James Cook","Team":"BUF","Position":"RB","PlayerID":"8138","KeeperYear":1,"AuctionValue":30.0,"DraftKeepCost":35.0,"WaiverKeepCost":null,"Cost":35.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Dalton Kincaid","Team":"BUF","Position":"TE","PlayerID":"10236","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Darren Waller","Team":"","Position":"TE","PlayerID":"2505","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":47.0,"Cost":47.0,"CostSource":"Waiver"},{"Owner":"mawki","Player":"Courtland Sutton","Team":"DEN","Position":"WR","PlayerID":"5045","KeeperYear":1,"AuctionValue":15.0,"DraftKeepCost":20.0,"WaiverKeepCost":null,"Cost":20.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"DK Metcalf","Team":"PIT","Position":"WR","PlayerID":"5846","KeeperYear":1,"AuctionValue":26.0,"DraftKeepCost":31.0,"WaiverKeepCost":null,"Cost":31.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Garrett Wilson","Team":"NYJ","Position":"WR","PlayerID":"8146","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"George Pickens","Team":"DAL","Position":"WR","PlayerID":"8137","KeeperYear":2,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"mawki","Player":"Nico Collins","Team":"HOU","Position":"WR","PlayerID":"7569","KeeperYear":1,"AuctionValue":20.0,"DraftKeepCost":25.0,"WaiverKeepCost":null,"Cost":25.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Pittsburgh Steelers","Team":"PIT","Position":"DEF","PlayerID":"PIT","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":15.0,"Cost":23.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Justin Herbert","Team":"LAC","Position":"QB","PlayerID":"6797","KeeperYear":1,"AuctionValue":2.0,"DraftKeepCost":10.0,"WaiverKeepCost":57.0,"Cost":57.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Cam Skattebo","Team":"NYG","Position":"RB","PlayerID":"12481","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":17.0,"Cost":17.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Jacory Croskey-Merritt","Team":"WAS","Position":"RB","PlayerID":"12533","KeeperYear":1,"AuctionValue":18.0,"DraftKeepCost":23.0,"WaiverKeepCost":null,"Cost":23.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Tyjae Spears","Team":"TEN","Position":"RB","PlayerID":"9508","KeeperYear":1,"AuctionValue":1.0,"DraftKeepCost":10.0,"WaiverKeepCost":null,"Cost":10.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Colston Loveland","Team":"CHI","Position":"TE","PlayerID":"12517","KeeperYear":1,"AuctionValue":5.0,"DraftKeepCost":10.0,"WaiverKeepCost":15.0,"Cost":15.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Malik Nabers","Team":"NYG","Position":"WR","PlayerID":"11632","KeeperYear":1,"AuctionValue":27.0,"DraftKeepCost":32.0,"WaiverKeepCost":null,"Cost":32.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Quentin Johnston","Team":"LAC","Position":"WR","PlayerID":"9754","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":47.0,"Cost":47.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Ricky Pearsall","Team":"SF","Position":"WR","PlayerID":"11638","KeeperYear":1,"AuctionValue":14.0,"DraftKeepCost":19.0,"WaiverKeepCost":null,"Cost":19.0,"CostSource":"Draft"},{"Owner":"rulis","Player":"Romeo Doubs","Team":"NE","Position":"WR","PlayerID":"8121","KeeperYear":1,"AuctionValue":0.0,"DraftKeepCost":null,"WaiverKeepCost":37.0,"Cost":37.0,"CostSource":"Waiver"},{"Owner":"rulis","Player":"Tetairoa McMillan","Team":"CAR","Position":"WR","PlayerID":"12526","KeeperYear":1,"AuctionValue":34.0,"DraftKeepCost":39.0,"WaiverKeepCost":null,"Cost":39.0,"CostSource":"Draft"}];
 
 const gallery = document.getElementById('owner-gallery');
 const keeperDisplay = document.getElementById('keeper-display');
-const fileInput = document.getElementById('workbook-file');
-const loadStatus = document.getElementById('load-status');
 
 function money(value) {
   const number = Number(value);
@@ -324,28 +239,6 @@ function money(value) {
         maximumFractionDigits: 2
       })
     : '';
-}
-
-function normalizeRow(row) {
-  return {
-    Owner: String(row.Manager ?? row.Owner ?? '').trim(),
-    Player: String(row.Player_Name ?? row.Player ?? '').trim(),
-    Team: String(row.Team ?? '').trim(),
-    Position: String(row.Position ?? '').trim(),
-    PlayerID: String(row.Player_ID ?? '').trim(),
-    KeeperYear: Number(row.Keeper_Year ?? row.KeeperYear ?? 0),
-    AuctionValue: Number(row.Auction_Value ?? 0),
-    DraftKeepCost:
-      row.Draft_Keep_Cost === '' || row.Draft_Keep_Cost == null
-        ? null
-        : Number(row.Draft_Keep_Cost),
-    WaiverKeepCost:
-      row.Waiver_Keep_Cost === '' || row.Waiver_Keep_Cost == null
-        ? null
-        : Number(row.Waiver_Keep_Cost),
-    Cost: Number(row['2026_Keep_Cost'] ?? row.Cost ?? 0),
-    CostSource: String(row.Cost_Source ?? '').trim()
-  };
 }
 
 function renderOwners() {
@@ -421,63 +314,7 @@ function showKeepers(owner) {
   keeperDisplay.innerHTML = table;
 }
 
-fileInput.addEventListener('change', event => {
-  const file = event.target.files[0];
-
-  if (!file) {
-    loadStatus.textContent = 'No workbook loaded.';
-    return;
-  }
-
-  loadStatus.textContent = `Loading ${file.name}...`;
-
-  const reader = new FileReader();
-
-  reader.onload = e => {
-    try {
-      const workbook = XLSX.read(e.target.result, { type: 'array' });
-
-      const preferredSheet = '2026 Eligible Keepers';
-      const sheetName = workbook.SheetNames.includes(preferredSheet)
-        ? preferredSheet
-        : workbook.SheetNames[0];
-
-      const worksheet = workbook.Sheets[sheetName];
-      const rows = XLSX.utils.sheet_to_json(worksheet, {
-        defval: '',
-        raw: true
-      });
-
-      keepersData = rows
-        .map(normalizeRow)
-        .filter(row => row.Owner && row.Player);
-
-      if (keepersData.length === 0) {
-        throw new Error(
-          `No keeper rows were found in the "${sheetName}" sheet.`
-        );
-      }
-
-      renderOwners();
-
-      loadStatus.textContent =
-        `Loaded ${keepersData.length} eligible players from ` +
-        `"${sheetName}" in ${file.name}.`;
-    } catch (error) {
-      console.error(error);
-      keepersData = [];
-      gallery.innerHTML = '';
-      keeperDisplay.innerHTML = '';
-      loadStatus.textContent = `Could not load workbook: ${error.message}`;
-    }
-  };
-
-  reader.onerror = () => {
-    loadStatus.textContent = 'Could not read the selected workbook.';
-  };
-
-  reader.readAsArrayBuffer(file);
-});
+renderOwners();
 </script>
 </body>
 </html>
